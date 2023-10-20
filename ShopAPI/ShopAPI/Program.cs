@@ -1,4 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using ShopAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Setup the database
+builder.Services.AddDbContext<ApplicationDbContext>(
+        o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
 // Add services to the container.
 
