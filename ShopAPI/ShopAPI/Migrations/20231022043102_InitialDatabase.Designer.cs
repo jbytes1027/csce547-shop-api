@@ -11,7 +11,7 @@ using ShopAPI.Data;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231022040542_InitialDatabase")]
+    [Migration("20231022043102_InitialDatabase")]
     partial class InitialDatabase
     {
         /// <inheritdoc />
@@ -90,6 +90,8 @@ namespace ShopAPI.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Category");
 
                     b.ToTable("Products");
 

@@ -88,6 +88,8 @@ namespace ShopAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Category");
+
                     b.ToTable("Products");
 
                     b.UseTptMappingStrategy();

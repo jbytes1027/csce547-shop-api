@@ -113,6 +113,11 @@ namespace ShopAPI.Migrations
                 name: "IX_CartItems_ProductId",
                 table: "CartItems",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Category",
+                table: "Products",
+                column: "Category");
         }
 
         /// <inheritdoc />
