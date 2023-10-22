@@ -38,7 +38,7 @@ namespace ShopAPI.Mappers
         /// <param name="product">The Product object to convert.</param>
         /// <returns>A ProductDTO representing the converted product.</returns>
         /// <exception cref="NotImplementedException">Thrown when the product type is not supported.</exception>
-        public static ProductDTO ModelToDTO(this Product product)
+        public static ProductDTO ModelToDTO(this Product product, bool includeDetails = true)
         {
             ProductDTO dto = new ProductDTO
             {
@@ -47,9 +47,13 @@ namespace ShopAPI.Mappers
                 Category = product.Category.ToString(),
                 Price = product.Price,
                 Description = product.Description,
-                Manufacturer = product.Manufacturer,
-                Details = GetDetails(product)
+                Manufacturer = product.Manufacturer
             };
+
+            if (includeDetails)
+            {
+                dto.Details = GetDetails(product);
+            }
 
             return dto;
         }
@@ -59,8 +63,8 @@ namespace ShopAPI.Mappers
         /// </summary>
         /// <param name="products">The collection of Product objects to convert.</param>
         /// <returns>A collection of ProductDTO representing the converted products.</returns>
-        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products) => 
-            products.Select(p => p.ModelToDTO());
+        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products, bool includeDetails = true) => 
+            products.Select(p => p.ModelToDTO(includeDetails));
 
         private static Dictionary<string, string> GetDetails(Product product)
         {

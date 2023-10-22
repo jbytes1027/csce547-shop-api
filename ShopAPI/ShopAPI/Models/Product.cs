@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace ShopAPI.Models
+﻿namespace ShopAPI.Models
 {
     public class Product
     {
