@@ -5,15 +5,14 @@ using ShopAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// use environment vars
 DotNetEnv.Env.TraversePath().Load();
 builder.Configuration.AddEnvironmentVariables();
-
-
-
-// Setup the database
 string? connectionString = builder.Configuration["CONNECTION_STRING"];
 if (connectionString is null) throw new Exception("No Connection String Found");
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(connectionString));
+
+// Setup the database
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
 // Add services to the container.
 builder.Services.AddScoped<IProductService, ProductService>();
