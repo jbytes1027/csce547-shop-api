@@ -48,26 +48,8 @@ namespace ShopAPI.Mappers
                 Price = product.Price,
                 Description = product.Description,
                 Manufacturer = product.Manufacturer,
-                Details = new Dictionary<string, string>()
+                Details = GetDetails(product)
             };
-
-            switch (product)
-            {
-                case Cpu cpu:
-                    dto.Details.Add("stocket", cpu.Socket);
-                    dto.Details.Add("cores", cpu.Cores.ToString());
-                    dto.Details.Add("series", cpu.Series.ToString());
-                    dto.Details.Add("integratedGraphics", cpu.IntegratedGraphics.ToString());
-                    break;
-                case Case case_:
-                    dto.Details.Add("color", case_.Color);
-                    dto.Details.Add("formFactor", case_.FormFactor);
-                    dto.Details.Add("sidePanel", case_.SidePanel);
-                    dto.Details.Add("powerSupply", case_.PowerSupply.ToString());
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
 
             return dto;
         }
@@ -77,9 +59,23 @@ namespace ShopAPI.Mappers
         /// </summary>
         /// <param name="products">The collection of Product objects to convert.</param>
         /// <returns>A collection of ProductDTO representing the converted products.</returns>
-        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products)
+        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products) => 
+            products.Select(p => p.ModelToDTO());
+
+        private static Dictionary<string, string> GetDetails(Product product)
         {
-            return products.Select(p => p.ModelToDTO());
+            Dictionary<string, string> details = new();
+
+            var properties = product.GetType().GetProperties()
+                .Where(prop => prop.DeclaringType == product.GetType());
+
+            foreach (var property in properties)
+            {
+                details.Add(property.Name.ToLowerInvariant(), property.GetValue(product)?.ToString() ?? "");
+            }
+
+            return details;
         }
+
     }
 }
