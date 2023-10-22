@@ -1,4 +1,6 @@
-﻿namespace ShopAPI.Models
+﻿using Newtonsoft.Json;
+
+namespace ShopAPI.Models
 {
     public class Product
     {
@@ -10,15 +12,30 @@
         public string Manufacturer { get; set; }
     }
 
+    public class Case : Product
+    {
+        public string Color { get; set; }
+        public string FormFactor { get; set; }
+        public string SidePanel { get; set; }
+        public bool PowerSupply { get; set; }
+    }
+
+    public class Cpu : Product
+    {
+        public string Socket { get; set; }
+        public int Cores { get; set; }
+        public string Series { get; set; }
+        public bool IntegratedGraphics { get; set; }
+    }
     public enum Category
     {
-        Case = 0,
-        CPU = 1,
-        CPUCooler = 2,
-        Memory = 3,
-        Motherboard = 4,
-        PowerSupply = 5,
-        Storage = 6,
-        VideoCard = 7
+        Cpu,
+        CpuCooler,
+        Motherboard,
+        Memory,
+        Storage,
+        VideoCard,
+        PowerSupply,
+        Case
     }
 }

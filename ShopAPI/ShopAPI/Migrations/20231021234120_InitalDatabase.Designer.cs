@@ -11,8 +11,8 @@ using ShopAPI.Data;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231020014055_InitialDatabase")]
-    partial class InitialDatabase
+    [Migration("20231021234120_InitalDatabase")]
+    partial class InitalDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,27 +23,6 @@ namespace ShopAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("ShopAPI.Models.CPU", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Cores")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("CPUs");
-                });
 
             modelBuilder.Entity("ShopAPI.Models.Cart", b =>
                 {
@@ -76,28 +55,6 @@ namespace ShopAPI.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("ShopAPI.Models.Case", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Cases");
-                });
-
             modelBuilder.Entity("ShopAPI.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -127,17 +84,51 @@ namespace ShopAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+
+                    b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("ShopAPI.Models.CPU", b =>
+            modelBuilder.Entity("ShopAPI.Models.Case", b =>
                 {
-                    b.HasOne("ShopAPI.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("ShopAPI.Models.Product");
 
-                    b.Navigation("Product");
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FormFactor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PowerSupply")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SidePanel")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("Cases", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Cpu", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<int>("Cores")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IntegratedGraphics")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Series")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Socket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("Cpus", (string)null);
                 });
 
             modelBuilder.Entity("ShopAPI.Models.CartItem", b =>
@@ -161,13 +152,20 @@ namespace ShopAPI.Migrations
 
             modelBuilder.Entity("ShopAPI.Models.Case", b =>
                 {
-                    b.HasOne("ShopAPI.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.Case", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Product");
+            modelBuilder.Entity("ShopAPI.Models.Cpu", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.Cpu", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShopAPI.Models.Cart", b =>
