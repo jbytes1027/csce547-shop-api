@@ -20,7 +20,7 @@ namespace ShopAPI.Controllers
 
         // GET: api/products/
         [HttpGet]
-        public async Task<IActionResult> GetProducts([FromQuery] string? category = null, [FromQuery] string? searchString = null)
+        public async Task<IActionResult> GetProducts([FromQuery] string? category = null, [FromQuery] string? searchTerm = null)
         {
             Category? productCategory = null;
 
@@ -36,7 +36,7 @@ namespace ShopAPI.Controllers
                 }
             }
 
-            var products = await _productService.GetProdcutsAsync(productCategory, searchString);
+            var products = await _productService.GetProdcutsAsync(productCategory, searchTerm);
 
             if (products == null || !products.Any())
             {
