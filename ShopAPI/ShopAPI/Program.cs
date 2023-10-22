@@ -3,10 +3,14 @@ using ShopAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// use environment vars
+DotNetEnv.Env.TraversePath().Load();
+builder.Configuration.AddEnvironmentVariables();
+string? connectionString = builder.Configuration["CONNECTION_STRING"];
+if (connectionString is null) throw new Exception("No Connection String Found");
+
 // Setup the database
-builder.Services.AddDbContext<ApplicationDbContext>(
-        o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
 // Add services to the container.
 
