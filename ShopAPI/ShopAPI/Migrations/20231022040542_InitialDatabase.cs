@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ShopAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalDatabase : Migration
+    public partial class InitialDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,9 @@ namespace ShopAPI.Migrations
                     Category = table.Column<int>(type: "integer", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Manufacturer = table.Column<string>(type: "text", nullable: false)
+                    Manufacturer = table.Column<string>(type: "text", nullable: false),
+                    NormalizedName = table.Column<string>(type: "text", nullable: false),
+                    NormalizedDescription = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

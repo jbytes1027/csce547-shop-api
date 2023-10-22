@@ -1,11 +1,18 @@
 ﻿using ShopAPI.Models;
-using System.Reflection;
 
 namespace ShopAPI.Helpers
 {
     public static class ProductHelper
     {
-        // L
+        /// <summary>
+        /// Validates product details based on the specified category and a dictionary of details.
+        /// </summary>
+        /// <param name="category">The category of the product.</param>
+        /// <param name="details">A dictionary containing details to be validated.</param>
+        /// <returns>
+        /// If the category is invalid, returns "No category found."
+        /// If there are missing properties in the details, returns an error message listing the required properties.
+        /// If the details are valid, returns null.
         public static string? ValidateProductDetails(Category category, Dictionary<string, string> details)
         {
             var requiredProperties = GetRequiredPropertiesForCategory(category);
@@ -26,6 +33,11 @@ namespace ShopAPI.Helpers
 
         }
 
+        /// <summary>
+        /// Tries to parse a string into a Category enum. Returns the parsed Category or null if unsuccessful.
+        /// </summary>
+        /// <param name="category">The string representation of the category.</param>
+        /// <returns>The parsed Category or null if parsing fails.</returns>
         public static Category? TryGetCategory(string? category)
         {
             if (Enum.TryParse(category, ignoreCase: true, out Category productCategory))
@@ -36,6 +48,13 @@ namespace ShopAPI.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Gets the required properties for a specified category.
+        /// </summary>
+        /// <param name="category">The category for which to retrieve required properties.</param>
+        /// <returns>
+        /// A collection of required property names for the specified category or null if the category is not recognized.
+        /// </returns>
         private static IEnumerable<string>? GetRequiredPropertiesForCategory(Category category)
         {
             IEnumerable<string> requiredProperties;

@@ -34,8 +34,12 @@ namespace ShopAPI.Services
 
             if (searchTerm != null)
             {
-                query = query.Where(p => p.Name.Contains(searchTerm) || p.Description.Contains(searchTerm));
+                // Convert searchTerm to lowercase
+                var searchTermLower = searchTerm.ToLower();
+
+                query = query.Where(p => p.NormalizedName.Contains(searchTermLower) || p.NormalizedDescription.Contains(searchTermLower));
             }
+
 
             return await query.ToListAsync();
         }
