@@ -17,6 +17,12 @@ namespace ShopAPI.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves products based on an optional category and an optional search term.
+        /// </summary>
+        /// <param name="category">The optional category to filter products.</param>
+        /// <param name="searchTerm">The optional search term to filter products by name or description.</param>
+        /// <returns>A collection of products matching the specified criteria.</returns>
         public async Task<IEnumerable<Product>?> GetProdcutsAsync(Category? category, string? searchTerm)
         {
             IQueryable<Product> query = _context.Products;
@@ -34,6 +40,12 @@ namespace ShopAPI.Services
             return await query.ToListAsync();
         }
 
+        /// <summary>
+        /// Creates a new product and adds it to the database with additional details.
+        /// </summary>
+        /// <param name="product">The base product to create.</param>
+        /// <param name="details">Additional details to populate in the product.</param>
+        /// <returns>The created product if successful, otherwise null.</returns>
         public async Task<Product?> CreateProductAsync(Product product, Dictionary<string, string> details)
         {
             if (product == null || details == null)
@@ -62,11 +74,20 @@ namespace ShopAPI.Services
             return product;
         }
 
+        /// <summary>
+        /// Retrieves a product by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the product to retrieve.</param>
+        /// <returns>The retrieved product or null if not found.</returns>
         public async Task<Product?> GetProductAsync(int id)
         {
             return await _context.Products.FindAsync(id);
         }
 
+        /// <summary>
+        /// Removes a product by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the product to remove.</param>
         public async Task RemoveProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);

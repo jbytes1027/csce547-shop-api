@@ -1,8 +1,4 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ShopAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
@@ -28,6 +24,8 @@ namespace ShopAPI.Controllers
         {
             Category? productCategory = null;
 
+            // Try to parse the category
+            // If the category is invalid, return a bad request
             if (category != null)
             {
                 productCategory = ProductHelper.TryGetCategory(category);
@@ -76,12 +74,13 @@ namespace ShopAPI.Controllers
                 return BadRequest("Invalid category");
             }
 
-            // Create a new product
+            // Create a new base product entity
             var baseProduct = dto.ToBaseProduct(productCategory);
 
-            // Validate the product details
+            // Make sure the product details are valid
             var validationError = ProductHelper.ValidateProductDetails(productCategory, dto.Details);
 
+            // If the product details are invalid, return a bad request
             if (validationError != null)
             {
                 return BadRequest(validationError);

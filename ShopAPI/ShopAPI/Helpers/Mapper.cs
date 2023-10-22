@@ -5,6 +5,13 @@ namespace ShopAPI.Mappers
 {
     public static class Mapper
     {
+        /// <summary>
+        /// Converts a ProductDTO to the base Product type based on the specified category.
+        /// </summary>
+        /// <param name="dto">The ProductDTO to convert.</param>
+        /// <param name="category">The category of the product.</param>
+        /// <returns>The base Product object with properties populated from the DTO.</returns>
+        /// <exception cref="NotImplementedException">Thrown when the provided category is not supported.</exception>
         public static Product ToBaseProduct(this ProductDTO dto, Category category)
         {
             Product product = category switch
@@ -23,6 +30,12 @@ namespace ShopAPI.Mappers
             return product;
         }
 
+        /// <summary>
+        /// Converts a Product object to a ProductDTO, including additional details based on the product type.
+        /// </summary>
+        /// <param name="product">The Product object to convert.</param>
+        /// <returns>A ProductDTO representing the converted product.</returns>
+        /// <exception cref="NotImplementedException">Thrown when the product type is not supported.</exception>
         public static ProductDTO ModelToDTO(this Product product)
         {
             ProductDTO dto = new ProductDTO
@@ -57,6 +70,11 @@ namespace ShopAPI.Mappers
             return dto;
         }
 
+        /// <summary>
+        /// Converts a collection of Product objects to a collection of ProductDTO objects.
+        /// </summary>
+        /// <param name="products">The collection of Product objects to convert.</param>
+        /// <returns>A collection of ProductDTO representing the converted products.</returns>
         public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products)
         {
             return products.Select(p => p.ModelToDTO());
