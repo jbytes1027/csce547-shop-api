@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using ShopAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
+using ShopAPI.Helpers;
+using ShopAPI.Interfaces;
+using ShopAPI.Mappers;
 using ShopAPI.Models;
 
 namespace ShopAPI.Controllers
@@ -10,92 +11,99 @@ namespace ShopAPI.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProductService _productService;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
-        // GET: api/products
+        // GET: api/products/
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<IActionResult> GetProducts([FromQuery] string? category = null, [FromQuery] string? searchTerm = null)
         {
-            return Ok(_context.Products);
+            Category? productCategory = null;
+
+            // Try to parse the category
+            // If the category is invalid, return a bad request
+            if (category != null)
+            {
+                productCategory = ProductHelper.TryGetCategory(category);
+
+                if (productCategory == null)
+                {
+                    return BadRequest("Invalid category");
+                }
+            }
+
+            var products = await _productService.GetProdcutsAsync(productCategory, searchTerm);
+
+            if (products == null || !products.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(products.ModelsToDTO());
         }
 
-        // GET: api/products/5
+        // GET: api/products/{id}
         [HttpGet("{id}")]
-        public IActionResult GetProduct(int id)
+        public async Task<IActionResult> GetProductById(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _productService.GetProductAsync(id);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            // Convert to dto
-            var dto = new ProductDTO
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Category = product.Category,
-                Price = product.Price,
-                Description = product.Description,
-                Manufacturer = product.Manufacturer
-            };
-
-            // Add the product's details depending on the Category
-            switch (product.Category)
-            {
-                case Category.CPU:
-                    var cpu = _context.CPUs.Where(c => c.ProductId == id).FirstOrDefault();
-                    dto.Details = new Dictionary<string, string>
-                    {
-                        { "Cores", cpu.Cores.ToString() }
-                    };
-                    break;
-                default:
-                    return BadRequest("No category provided");
-            }
-
-            return Ok(dto);
+            return Ok(product.ModelToDTO());
         }
 
+        // POST: api/products
         [HttpPost]
-        public IActionResult PostProduct(ProductDTO dto)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
-            // Create a new product
-            var product = new Product
+            if (dto == null)
             {
-                Name = dto.Name,
-                Category = dto.Category,
-                Price = dto.Price,
-                Description = dto.Description,
-                Manufacturer = dto.Manufacturer
-            };
-            _context.Products.Add(product);
-            _context.SaveChanges();
-
-            // Add the product's details depending on the Category
-            switch (dto.Category)
-            {
-                case Category.CPU:
-                    int v = int.Parse(dto.Details["Cores"]);
-                    var cpu = new CPU
-                    {
-                        Cores = v,
-                        ProductId = product.Id
-                    };
-                    _context.CPUs.Add(cpu);
-                    _context.SaveChanges();
-                    break;
-                default:
-                    return BadRequest("No category provided");
+                return BadRequest("Invalid product data");
             }
 
-            return GetProduct(product.Id);
+            if (!Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory))
+            {
+                return BadRequest("Invalid category");
+            }
+
+            // Create a new base product entity
+            var baseProduct = dto.ToBaseProduct(productCategory);
+
+            // Make sure the product details are valid
+            var validationError = ProductHelper.ValidateProductDetails(productCategory, dto.Details);
+
+            // If the product details are invalid, return a bad request
+            if (validationError != null)
+            {
+                return BadRequest(validationError);
+            }
+
+            // Add the product to the database
+            var product = await _productService.CreateProductAsync(baseProduct, dto.Details);
+
+            if (product == null)
+            {
+                return BadRequest("Invalid product data");
+            }
+
+            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+        }
+
+        // DELETE: api/products/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            await _productService.RemoveProductAsync(id);
+
+            return NoContent();
         }
     }
 }

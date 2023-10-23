@@ -33,7 +33,9 @@ namespace ShopAPI.Migrations
                     Category = table.Column<int>(type: "integer", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Manufacturer = table.Column<string>(type: "text", nullable: false)
+                    Manufacturer = table.Column<string>(type: "text", nullable: false),
+                    NormalizedName = table.Column<string>(type: "text", nullable: false),
+                    NormalizedDescription = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,37 +71,39 @@ namespace ShopAPI.Migrations
                 name: "Cases",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<int>(type: "integer", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false),
-                    ProductId = table.Column<int>(type: "integer", nullable: false)
+                    FormFactor = table.Column<string>(type: "text", nullable: false),
+                    SidePanel = table.Column<string>(type: "text", nullable: false),
+                    PowerSupply = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cases", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cases_Products_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Cases_Products_Id",
+                        column: x => x.Id,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CPUs",
+                name: "Cpus",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Socket = table.Column<string>(type: "text", nullable: false),
                     Cores = table.Column<int>(type: "integer", nullable: false),
-                    ProductId = table.Column<int>(type: "integer", nullable: false)
+                    Series = table.Column<string>(type: "text", nullable: false),
+                    IntegratedGraphics = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CPUs", x => x.Id);
+                    table.PrimaryKey("PK_Cpus", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CPUs_Products_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Cpus_Products_Id",
+                        column: x => x.Id,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -111,14 +115,9 @@ namespace ShopAPI.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cases_ProductId",
-                table: "Cases",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CPUs_ProductId",
-                table: "CPUs",
-                column: "ProductId");
+                name: "IX_Products_Category",
+                table: "Products",
+                column: "Category");
         }
 
         /// <inheritdoc />
@@ -131,7 +130,7 @@ namespace ShopAPI.Migrations
                 name: "Cases");
 
             migrationBuilder.DropTable(
-                name: "CPUs");
+                name: "Cpus");
 
             migrationBuilder.DropTable(
                 name: "Carts");
