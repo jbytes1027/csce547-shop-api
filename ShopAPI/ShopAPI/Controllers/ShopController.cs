@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
@@ -7,33 +8,38 @@ using ShopAPI.Models;
 
 namespace ShopAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ShopController : ControllerBase
     {
         private readonly IProductService _productService;
 
-        public ProductsController(IProductService productService)
+        public ShopController(IProductService productService)
         {
             _productService = productService;
         }
 
-        // GET: api/products/
-        [HttpGet]
-        public async Task<IActionResult> GetProducts([FromQuery] string? category = null, [FromQuery] string? searchTerm = null)
+        // GET: api/Item/GetAllItems
+        [HttpGet("Item/GetAllItems")]
+        public async Task<IActionResult> GetAllProducts()
         {
-            Category? productCategory = null;
+            var products = await _productService.GetProdcutsAsync(null, null);
 
-            // Try to parse the category
-            // If the category is invalid, return a bad request
-            if (category != null)
+            if (products == null || !products.Any())
             {
-                productCategory = ProductHelper.TryGetCategory(category);
+                return NotFound();
+            }
 
-                if (productCategory == null)
-                {
-                    return BadRequest("Invalid category");
-                }
+            return Ok(products.ModelsToDTO());
+        }   
+
+        // GET: api/Item/Filter
+        [HttpGet("Item/Filter/{category}")]
+        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm = null)
+        {
+            if (!Enum.TryParse(category, ignoreCase: true, out Category productCategory))
+            {
+                return BadRequest("Invalid category");
             }
 
             var products = await _productService.GetProdcutsAsync(productCategory, searchTerm);
@@ -46,8 +52,8 @@ namespace ShopAPI.Controllers
             return Ok(products.ModelsToDTO());
         }
 
-        // GET: api/products/{id}
-        [HttpGet("{id}")]
+        // GET: api/Item/{id}
+        [HttpGet("Item/{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _productService.GetProductAsync(id);
@@ -60,8 +66,9 @@ namespace ShopAPI.Controllers
             return Ok(product.ModelToDTO());
         }
 
-        // POST: api/products
+        // POST: api/item
         [HttpPost]
+        [Route("Item")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
             if (dto == null)
@@ -98,9 +105,16 @@ namespace ShopAPI.Controllers
         }
 
         // DELETE: api/products/{id}
-        [HttpDelete("{id}")]
+        [HttpDelete("Item/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            // Find the product
+            var product = await _productService.GetProductAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             await _productService.RemoveProductAsync(id);
 
             return NoContent();
