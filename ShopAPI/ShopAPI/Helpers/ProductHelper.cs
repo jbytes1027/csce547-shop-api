@@ -34,21 +34,6 @@ namespace ShopAPI.Helpers
         }
 
         /// <summary>
-        /// Tries to parse a string into a Category enum. Returns the parsed Category or null if unsuccessful.
-        /// </summary>
-        /// <param name="category">The string representation of the category.</param>
-        /// <returns>The parsed Category or null if parsing fails.</returns>
-        public static Category? TryGetCategory(string? category)
-        {
-            if (Enum.TryParse(category, ignoreCase: true, out Category productCategory))
-            {
-                return productCategory;
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Gets the required properties for a specified category.
         /// </summary>
         /// <param name="category">The category for which to retrieve required properties.</param>
