@@ -79,27 +79,27 @@ namespace ShopAPI.Helpers
                     break;
                 
                 case Category.Motherboard:
-                    var motherboardProperties = typeof(CpuCooler).GetProperties();
+                    var motherboardProperties = typeof(Motherboard).GetProperties();
                     requiredProperties = motherboardProperties.Select(p => p.Name);
                     break;
                 
                 case Category.Memory:
-                    var memoryProperties = typeof(CpuCooler).GetProperties();
+                    var memoryProperties = typeof(Memory).GetProperties();
                     requiredProperties = memoryProperties.Select(p => p.Name);
                     break;
                                 
                 case Category.Storage:
-                    var storageProperties = typeof(CpuCooler).GetProperties();
+                    var storageProperties = typeof(Storage).GetProperties();
                     requiredProperties = storageProperties.Select(p => p.Name);
                     break;
                                 
                 case Category.VideoCard:
-                    var videoCardProperties = typeof(CpuCooler).GetProperties();
+                    var videoCardProperties = typeof(VideoCard).GetProperties();
                     requiredProperties = videoCardProperties.Select(p => p.Name);
                     break;
                  
                 case Category.PowerSupply:
-                    var powerSupplyProperties = typeof(CpuCooler).GetProperties();
+                    var powerSupplyProperties = typeof(PowerSupply).GetProperties();
                     requiredProperties =powerSupplyProperties.Select(p => p.Name);
                     break;
                  

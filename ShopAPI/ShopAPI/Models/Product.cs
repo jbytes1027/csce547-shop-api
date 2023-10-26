@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
-namespace ShopAPI.Models
+﻿namespace ShopAPI.Models
 {
     public class Product
     {
@@ -55,6 +53,7 @@ namespace ShopAPI.Models
     public class Storage : Product
     {
         public string ConnectionType { get; set; } // SATA, NVMe, USB, or IDE (IDE not really used anymore)
+        public string DriveType { get; set; } // Flash/SSD/HDD
         public int Speed { get; set; } 
         public int Size { get; set; }
     }
