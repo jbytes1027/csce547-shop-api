@@ -18,6 +18,12 @@ namespace ShopAPI.Mappers
             {
                 Category.Cpu => new Cpu(),
                 Category.Case => new Case(),
+                Category.CpuCooler => new CpuCooler(),
+                Category.Memory => new Memory(),
+                Category.Motherboard => new Motherboard(),
+                Category.Storage => new Storage(),
+                Category.VideoCard => new VideoCard(),
+                Category.PowerSupply => new PowerSupply(),
                 _ => throw new NotImplementedException()
             };
 

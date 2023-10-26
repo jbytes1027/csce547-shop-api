@@ -23,6 +23,30 @@ namespace ShopAPI.Data
                 .ToTable("Cases")
                 .HasBaseType<Product>();
 
+            modelBuilder.Entity<CpuCooler>()
+                .ToTable("CpuCoolers")
+                .HasBaseType<Product>();
+
+            modelBuilder.Entity<Motherboard>()
+                .ToTable("Motherboards")
+                .HasBaseType<Product>();
+
+            modelBuilder.Entity<Memory>()
+                .ToTable("Memory")
+                .HasBaseType<Product>();
+
+            modelBuilder.Entity<Storage>()
+                .ToTable("Storage")
+                .HasBaseType<Product>();
+
+            modelBuilder.Entity<VideoCard>()
+                .ToTable("VideoCards")
+                .HasBaseType<Product>();
+
+            modelBuilder.Entity<PowerSupply>()
+                .ToTable("PowerSupplies")
+                .HasBaseType<Product>();
+            
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Product> Products { get; set; }

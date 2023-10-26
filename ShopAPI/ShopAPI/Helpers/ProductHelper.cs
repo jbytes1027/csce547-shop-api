@@ -49,17 +49,45 @@ namespace ShopAPI.Helpers
             switch (category)
             {
                 case Category.Cpu:
-
                     var cpuProperties = typeof(Cpu).GetProperties();
                     requiredProperties = cpuProperties.Select(p => p.Name);
                     break;
-
+                
                 case Category.Case:
-
                     var caseProperties = typeof(Case).GetProperties();
                     requiredProperties = caseProperties.Select(p => p.Name);
                     break;
-
+                
+                case Category.CpuCooler:
+                    var cpuCoolerProperties = typeof(CpuCooler).GetProperties();
+                    requiredProperties = cpuCoolerProperties.Select(p => p.Name);
+                    break;
+                
+                case Category.Motherboard:
+                    var motherboardProperties = typeof(Motherboard).GetProperties();
+                    requiredProperties = motherboardProperties.Select(p => p.Name);
+                    break;
+                
+                case Category.Memory:
+                    var memoryProperties = typeof(Memory).GetProperties();
+                    requiredProperties = memoryProperties.Select(p => p.Name);
+                    break;
+                                
+                case Category.Storage:
+                    var storageProperties = typeof(Storage).GetProperties();
+                    requiredProperties = storageProperties.Select(p => p.Name);
+                    break;
+                                
+                case Category.VideoCard:
+                    var videoCardProperties = typeof(VideoCard).GetProperties();
+                    requiredProperties = videoCardProperties.Select(p => p.Name);
+                    break;
+                 
+                case Category.PowerSupply:
+                    var powerSupplyProperties = typeof(PowerSupply).GetProperties();
+                    requiredProperties =powerSupplyProperties.Select(p => p.Name);
+                    break;
+                 
                 default:
                     return null;
             }

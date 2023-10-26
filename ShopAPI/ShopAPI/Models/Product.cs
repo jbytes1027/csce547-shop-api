@@ -27,6 +27,48 @@
         public string Series { get; set; }
         public bool IntegratedGraphics { get; set; }
     }
+    
+    public class CpuCooler : Product
+    {
+       public string Socket { get; set; } 
+       public bool IsWaterCooled { get; set; }
+       public string Size { get; set; } // set as string for now because sizes are usually represented as LxWxH
+    }
+
+    public class Motherboard : Product
+    {
+        public string Socket { get; set; }
+        public string Chipset { get; set; }
+        public string MemoryType { get; set; }
+        public string FormFactor { get; set; }
+    }
+
+    public class Memory : Product
+    {
+        public string MemoryType { get; set; }
+        public int Speed { get; set; }
+        public int Size { get; set; }
+    }
+
+    public class Storage : Product
+    {
+        public string ConnectionType { get; set; } // SATA, NVMe, USB, or IDE (IDE not really used anymore)
+        public string DriveType { get; set; } // Flash/SSD/HDD
+        public int Speed { get; set; } 
+        public int Size { get; set; }
+    }
+
+    public class VideoCard : Product
+    {
+       public string Series { get; set; }
+       public int ClockSpeed { get; set; }
+       public int VramSize { get; set; }
+    }
+
+    public class PowerSupply : Product
+    {
+        public int Wattage { get; set; }
+    }
     public enum Category
     {
         Cpu,
