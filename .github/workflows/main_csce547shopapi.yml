@@ -36,8 +36,8 @@ jobs:
 
       - name: Print files in artifact directory
         run: |
-            cd D:\a\PalmetoProgrammers547\PalmetoProgrammers547
-            dir ShopApi
+            cd D:\a\PalmetoProgrammers547\PalmetoProgrammers547\ShopAPI\ShopAPI\bin
+            pwd
         shell: pwsh
 
 
