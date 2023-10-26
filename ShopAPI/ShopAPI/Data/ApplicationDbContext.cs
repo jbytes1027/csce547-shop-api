@@ -54,5 +54,12 @@ namespace ShopAPI.Data
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Cpu> CPUs { get; set; }
         public DbSet<Case> Cases { get; set; }
+        public DbSet<CpuCooler> CpuCoolers { get; set; }
+        public DbSet<VideoCard> VideoCards { get; set; }
+        public DbSet<Memory> Memories { get; set; }
+        public DbSet<Storage> Storages { get; set; }
+        public DbSet<Motherboard> Motherboards { get; set; }
+        public DbSet<PowerSupply> PowerSupplies { get; set; }
+                
     }
 }
