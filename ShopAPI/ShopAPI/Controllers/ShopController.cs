@@ -6,6 +6,8 @@ using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
 
+using System.Runtime;
+
 namespace ShopAPI.Controllers
 {
     [Route("api")]
@@ -118,6 +120,52 @@ namespace ShopAPI.Controllers
             await _productService.RemoveProductAsync(id);
 
             return NoContent();
+        }
+        
+        // POST: api/processpayment
+        [HttpPost("ProcessPayment")]
+        public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Invalid Card details");
+            }
+
+            if (dto.CardNumber.ToString().Length != 16)
+            {
+                return BadRequest("Card length not correct");
+            }
+
+            if (dto.Cvv.ToString().Length != 3)
+            {
+                return BadRequest("CVV length incorrect");
+            }
+
+            if (string.IsNullOrEmpty(dto.Cvv.ToString()))
+            {
+                return BadRequest("CVV field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CardHolderName))
+            {
+                return BadRequest("Holder name field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CartId.ToString()))
+            {
+                return BadRequest("Card ID field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CardNumber.ToString()))
+            {
+                return BadRequest("Card Number field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.Exp))
+            {
+                return BadRequest("Expiration date field empty");
+            }
+            return Ok("Payment processed");
         }
     }
 }
