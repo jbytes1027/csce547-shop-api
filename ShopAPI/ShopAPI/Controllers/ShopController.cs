@@ -1,10 +1,10 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
+using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -12,10 +12,12 @@ namespace ShopAPI.Controllers
     [ApiController]
     public class ShopController : ControllerBase
     {
+        private readonly CartService _cartService;
         private readonly IProductService _productService;
 
-        public ShopController(IProductService productService)
+        public ShopController(CartService cartService, IProductService productService)
         {
+            _cartService = cartService;
             _productService = productService;
         }
 
@@ -31,7 +33,7 @@ namespace ShopAPI.Controllers
             }
 
             return Ok(products.ModelsToDTO());
-        }   
+        }
 
         // GET: api/Item/Filter
         [HttpGet("Item/Filter/{category}")]
@@ -118,6 +120,36 @@ namespace ShopAPI.Controllers
             await _productService.RemoveProductAsync(id);
 
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("AddItemToCart/{cartId}")]
+        public async Task<ActionResult<CartItemDTO>> AddItemToCart([FromRoute] int cartId, [FromBody] AddItemDTO item)
+        {
+            Product? product = await _productService.GetProductAsync(item.Id);
+
+            if (product is null)
+            {
+                return NotFound();
+            }
+
+            await _cartService.addItemAsync(cartId, item.Id, item.Quantity);
+
+            ProductDTO productDTO = product.ModelToDTO();
+            CartItemDTO cartItemDTO = new()
+            {
+                CartId = cartId,
+                Quantity = item.Quantity, // returned added quantity, not current quantity
+                Id = item.Id,
+                Name = productDTO.Name,
+                Category = productDTO.Category,
+                Price = productDTO.Price,
+                Description = productDTO.Description,
+                Manufacturer = productDTO.Manufacturer,
+                Details = productDTO.Details,
+            };
+
+            return Ok(cartItemDTO);
         }
     }
 }
