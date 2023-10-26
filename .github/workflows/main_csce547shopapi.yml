@@ -34,6 +34,13 @@ jobs:
             dotnet publish -c Release -o ShopApi
         shell: pwsh
 
+      - name: Print files in artifact directory
+        run: |
+            cd D:\a\PalmetoProgrammers547\PalmetoProgrammers547
+            dir ShopApi
+        shell: pwsh
+
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
