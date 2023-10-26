@@ -9,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.TraversePath().Load();
 builder.Configuration.AddEnvironmentVariables();
 string? connectionString = builder.Configuration["CONNECTION_STRING"];
+
+// Get connection string from azure if production
+if (builder.Environment.IsProduction())
+{
+    connectionString = builder.Configuration["POSTGRESQLCONNSTR_CONNECTION_STRING"];
+}
+
 if (connectionString is null) throw new Exception("No Connection String Found");
 
 // Setup the database
