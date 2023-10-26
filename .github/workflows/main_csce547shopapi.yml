@@ -23,16 +23,22 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: |
+            cd ShopApi
+            dotnet build --configuration Release
+        shell: pwsh
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: |
+            cd ShopApi
+            dotnet publish -c Release -o ShopApi
+        shell: pwsh
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: D:\a\PalmetoProgrammers547\PalmetoProgrammers547\ShopAPI\ShopAPI\bin
 
   deploy:
     runs-on: windows-latest
@@ -46,6 +52,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
+          path: ShopAPI/
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
