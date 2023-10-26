@@ -138,6 +138,112 @@ namespace ShopAPI.Migrations
                     b.ToTable("Cpus", (string)null);
                 });
 
+            modelBuilder.Entity("ShopAPI.Models.CpuCooler", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<bool>("IsWaterCooled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Socket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("CpuCoolers", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Memory", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<string>("MemoryType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Speed")
+                        .HasColumnType("integer");
+
+                    b.ToTable("Memory", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Motherboard", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<string>("Chipset")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FormFactor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MemoryType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Socket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.ToTable("Motherboards", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.PowerSupply", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<int>("Wattage")
+                        .HasColumnType("integer");
+
+                    b.ToTable("PowerSupplies", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Storage", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<string>("ConnectionType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DriveType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Speed")
+                        .HasColumnType("integer");
+
+                    b.ToTable("Storage", (string)null);
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.VideoCard", b =>
+                {
+                    b.HasBaseType("ShopAPI.Models.Product");
+
+                    b.Property<int>("ClockSpeed")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Series")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VramSize")
+                        .HasColumnType("integer");
+
+                    b.ToTable("VideoCards", (string)null);
+                });
+
             modelBuilder.Entity("ShopAPI.Models.CartItem", b =>
                 {
                     b.HasOne("ShopAPI.Models.Cart", "Cart")
@@ -171,6 +277,60 @@ namespace ShopAPI.Migrations
                     b.HasOne("ShopAPI.Models.Product", null)
                         .WithOne()
                         .HasForeignKey("ShopAPI.Models.Cpu", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.CpuCooler", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.CpuCooler", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Memory", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.Memory", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Motherboard", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.Motherboard", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.PowerSupply", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.PowerSupply", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Storage", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.Storage", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.VideoCard", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Product", null)
+                        .WithOne()
+                        .HasForeignKey("ShopAPI.Models.VideoCard", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
