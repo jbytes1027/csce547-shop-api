@@ -145,7 +145,7 @@ namespace ShopAPI.Controllers
         [Route("GetCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
-            List<CartItem> cartItems = await _cartService.getCartItemsAsync(cartId);
+            List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
             var totals = Calculate.Totals(cartItems);
 
             // Convert cartItems to cartItemsDTOs
@@ -170,7 +170,7 @@ namespace ShopAPI.Controllers
         [Route("GetTotals/{cartId}")]
         public async Task<ActionResult<TotalsDTO>> GetTotals(int cartId)
         {
-            List<CartItem> items = await _cartService.getCartItemsAsync(cartId);
+            List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
             var totals = Calculate.Totals(items);
 

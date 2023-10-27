@@ -82,13 +82,13 @@ public class CartService
     }
 
 
-    public Task<List<CartItem>> getAllItemsAsync()
+    public Task<List<CartItem>> GetAllItemsAsync()
     {
         var cartItems = _context.CartItems.ToList();
         return Task.FromResult(cartItems);
     }
 
-    public Task<List<CartItem>> getCartItemsAsync(int cartId)
+    public Task<List<CartItem>> GetCartItemsAsync(int cartId)
     {
         var cartItems = _context.CartItems
             .Where(item => item.CartId == cartId)
