@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.Models;
 
@@ -12,7 +13,7 @@ public class CartService
         _context = context;
     }
 
-    public Task<CartItem> addItemAsync(int cartId, int itemId, int quantity = 1)
+    public Task<CartItem> AddItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? prevItem = _context.CartItems.Find(cartId, itemId);
 
@@ -42,7 +43,7 @@ public class CartService
         return Task.FromResult(item);
     }
 
-    public Task<CartItem?> removeItemAsync(int cartId, int itemId, int quantity = 1)
+    public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? item = _context.CartItems.Find(cartId, itemId);
 
@@ -81,9 +82,18 @@ public class CartService
     }
 
 
-    public Task<List<CartItem>> getItemsAsync()
+    public Task<List<CartItem>> getAllItemsAsync()
     {
         var cartItems = _context.CartItems.ToList();
+        return Task.FromResult(cartItems);
+    }
+
+    public Task<List<CartItem>> getCartItemsAsync(int cartId)
+    {
+        var cartItems = _context.CartItems
+            .Where(item => item.CartId == cartId)
+            .Include(item => item.Product)
+            .ToList();
         return Task.FromResult(cartItems);
     }
 }

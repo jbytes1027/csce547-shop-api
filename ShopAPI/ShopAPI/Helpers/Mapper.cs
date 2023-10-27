@@ -27,7 +27,7 @@ namespace ShopAPI.Mappers
             product.Description = dto.Description;
             product.Manufacturer = dto.Manufacturer;
             product.NormalizedName = dto.Name.ToLower();
-            product.NormalizedDescription = dto.Description.ToLower();  
+            product.NormalizedDescription = dto.Description.ToLower();
 
             return product;
         }
@@ -58,12 +58,22 @@ namespace ShopAPI.Mappers
             return dto;
         }
 
+        public static TotalsDTO ToDTO(this List<Total> totals)
+        {
+            TotalsDTO totalsDTO = new();
+            foreach (var total in totals)
+            {
+                totalsDTO.Add(total.Type.ToString(), total.Value);
+            }
+            return totalsDTO;
+        }
+
         /// <summary>
         /// Converts a collection of Product objects to a collection of ProductDTO objects.
         /// </summary>
         /// <param name="products">The collection of Product objects to convert.</param>
         /// <returns>A collection of ProductDTO representing the converted products.</returns>
-        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products, bool includeDetails = true) => 
+        public static IEnumerable<ProductDTO> ModelsToDTO(this IEnumerable<Product> products, bool includeDetails = true) =>
             products.Select(p => p.ModelToDTO(includeDetails));
 
         private static Dictionary<string, string> GetDetails(Product product)

@@ -133,23 +133,48 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            await _cartService.addItemAsync(cartId, item.Id, item.Quantity);
+            await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
 
             ProductDTO productDTO = product.ModelToDTO();
-            CartItemDTO cartItemDTO = new()
-            {
-                CartId = cartId,
-                Quantity = item.Quantity, // returned added quantity, not current quantity
-                Id = item.Id,
-                Name = productDTO.Name,
-                Category = productDTO.Category,
-                Price = productDTO.Price,
-                Description = productDTO.Description,
-                Manufacturer = productDTO.Manufacturer,
-                Details = productDTO.Details,
-            };
+            CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
 
             return Ok(cartItemDTO);
+        }
+
+        [HttpGet]
+        [Route("GetCart/{cartId}")]
+        public async Task<ActionResult<CartDTO>> GetCart(int cartId)
+        {
+            List<CartItem> cartItems = await _cartService.getCartItemsAsync(cartId);
+            var totals = Calculate.Totals(cartItems);
+
+            // Convert cartItems to cartItemsDTOs
+            List<CartItemDTO> cartItemDTOs = new();
+            foreach (var cartItem in cartItems)
+            {
+                CartItemDTO cartItemDTO = new(cartItem.Product.ModelToDTO(), cartItem.Quantity);
+                cartItemDTOs.Add(cartItemDTO);
+            }
+
+            CartDTO cartDTO = new()
+            {
+                Id = cartId,
+                Items = cartItemDTOs,
+                Totals = totals.ToDTO()
+            };
+
+            return Ok(cartDTO);
+        }
+
+        [HttpGet]
+        [Route("GetTotals/{cartId}")]
+        public async Task<ActionResult<TotalsDTO>> GetTotals(int cartId)
+        {
+            List<CartItem> items = await _cartService.getCartItemsAsync(cartId);
+
+            var totals = Calculate.Totals(items);
+
+            return Ok(totals.ToDTO());
         }
     }
 }
