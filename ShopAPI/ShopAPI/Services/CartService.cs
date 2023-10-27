@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
+using ShopAPI.Interfaces;
 using ShopAPI.Models;
 
 namespace ShopAPI.Services;
 
-public class CartService
+public class CartService : ICartService
 {
     private readonly ApplicationDbContext _context;
 
