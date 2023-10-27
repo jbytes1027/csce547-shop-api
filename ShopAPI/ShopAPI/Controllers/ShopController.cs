@@ -149,7 +149,7 @@ namespace ShopAPI.Controllers
             var totals = Calculate.Totals(cartItems);
 
             // Convert cartItems to cartItemsDTOs
-            List<CartItemDTO> cartItemDTOs = new();
+            List<CartItemDTO> cartItemDTOs = new(cartItems.Count);
             foreach (var cartItem in cartItems)
             {
                 CartItemDTO cartItemDTO = new(cartItem.Product.ModelToDTO(), cartItem.Quantity);
