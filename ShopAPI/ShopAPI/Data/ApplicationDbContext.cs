@@ -58,7 +58,6 @@ namespace ShopAPI.Data
         public DbSet<Memory> Memories { get; set; }
         public DbSet<Storage> Storages { get; set; }
         public DbSet<Motherboard> Motherboards { get; set; }
-        public DbSet<PowerSupply> PowerSupplies { get; set; }
-                
+        public DbSet<PowerSupply> PowerSupplies { get; set; }    
     }
 }
