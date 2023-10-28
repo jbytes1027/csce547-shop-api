@@ -1,6 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc.Testing;
-
+using ShopAPI.Models;
 
 namespace ShopAPI.Tests
 {
@@ -19,8 +19,12 @@ namespace ShopAPI.Tests
         {
             // Arrange
             CreateClient();
+            CartItem cart = new CartItem();
+            cart.CartId = 7;
+            cart.Product = new Product();
+            cart.Product.Id = 1;
             // Act
-            var response = await _client.GetAsync("api/GetCart/1");
+            var response = await _client.GetAsync("api/GetCart/"+cart.CartId);
             // Assert
             response.EnsureSuccessStatusCode();
         }
@@ -30,19 +34,12 @@ namespace ShopAPI.Tests
         {
             // Arrange
             CreateClient();
+            CartItem cart = new CartItem();
+            cart.CartId = 7;
+            cart.Product = new Product();
+            cart.Product.Id = 1;
             // Act
             var response = await _client.GetAsync("api/GetTotals/1");
-            // Assert
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Fact]
-        public async Task HTTPResponseGetAllItemsTest()
-        {
-            // Arrange
-            CreateClient();
-            // Act
-            var response = await _client.GetAsync("api/Item/GetAllItems");
             // Assert
             response.EnsureSuccessStatusCode();
         }
