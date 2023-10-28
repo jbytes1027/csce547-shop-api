@@ -37,7 +37,7 @@ namespace ShopAPI.Services
                 // Convert searchTerm to lowercase
                 var searchTermLower = searchTerm.ToLower();
 
-                query = query.Where(p => p.NormalizedName.Contains(searchTermLower) || p.NormalizedDescription.Contains(searchTermLower));
+                query = query.Where(p => p.NormalizedName.Contains(searchTermLower));
             }
 
 

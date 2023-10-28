@@ -30,10 +30,8 @@ namespace ShopAPI.Mappers
             product.Name = dto.Name;
             product.Category = category;
             product.Price = dto.Price;
-            product.Description = dto.Description;
             product.Manufacturer = dto.Manufacturer;
             product.NormalizedName = dto.Name.ToLower();
-            product.NormalizedDescription = dto.Description.ToLower();
 
             return product;
         }
@@ -52,7 +50,6 @@ namespace ShopAPI.Mappers
                 Name = product.Name,
                 Category = product.Category.ToString(),
                 Price = product.Price,
-                Description = product.Description,
                 Manufacturer = product.Manufacturer
             };
 
