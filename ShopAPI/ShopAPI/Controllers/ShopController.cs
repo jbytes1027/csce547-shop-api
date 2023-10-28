@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
@@ -7,6 +8,7 @@ using ShopAPI.Models;
 using ShopAPI.Services;
 
 using System.Runtime;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace ShopAPI.Controllers
 {
@@ -133,9 +135,17 @@ namespace ShopAPI.Controllers
                 return BadRequest("Invalid Card details");
             }
 
+            // Checks if cart exists
+            var cart = await _cartService.GetCartItemsAsync(dto.CartId);
+            if (cart == null)
+            {
+                return BadRequest("Cart does not exist");
+            }
+            
+            // Field checking
             if (dto.CardNumber.ToString().Length != 16)
             {
-                return BadRequest("Card length not correct");
+                return BadRequest("Card length incorrect");
             }
 
             if (dto.Cvv.ToString().Length != 3)
@@ -168,7 +178,30 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            return Ok("Payment processed");
+            /* 
+            // TODO(epadams) Checking date more thoroughly, maybe split
+            try
+            {
+                var date = DateTime.Parse(dto.Exp).ToString("MM/y");
+                Console.WriteLine(date);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("Unable to parse date");
+            }
+            */
+            
+            // Gets total with tax
+            var totals = Calculate.Totals(cart);
+            decimal returnTotal = 0;
+            foreach (var t in totals)
+            {
+                if (t.Type == TotalType.TaxTotal)
+                {
+                    returnTotal = t.Value;
+                }
+            }
+            return Ok("Payment processed for " + returnTotal);
         }
 
         [HttpPost]
@@ -221,8 +254,7 @@ namespace ShopAPI.Controllers
         {
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
-            var totals = Calculate.Totals(items);
-
+            var totals = Calculate.Totals(items); 
             return Ok(totals.ToDTO());
         }
     }
