@@ -11,7 +11,7 @@ using ShopAPI.Data;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231027122111_InitialDatabase")]
+    [Migration("20231028175929_InitialDatabase")]
     partial class InitialDatabase
     {
         /// <inheritdoc />
@@ -23,19 +23,6 @@ namespace ShopAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("ShopAPI.Models.Cart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Carts");
-                });
 
             modelBuilder.Entity("ShopAPI.Models.CartItem", b =>
                 {
@@ -66,19 +53,11 @@ namespace ShopAPI.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Manufacturer")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("NormalizedDescription")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -249,19 +228,11 @@ namespace ShopAPI.Migrations
 
             modelBuilder.Entity("ShopAPI.Models.CartItem", b =>
                 {
-                    b.HasOne("ShopAPI.Models.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ShopAPI.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Cart");
 
                     b.Navigation("Product");
                 });
@@ -336,11 +307,6 @@ namespace ShopAPI.Migrations
                         .HasForeignKey("ShopAPI.Models.VideoCard", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ShopAPI.Models.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 #pragma warning restore 612, 618
         }
