@@ -1,6 +1,4 @@
-﻿using ShopAPI.Models;
-
-namespace ShopAPI.DTOs
+﻿namespace ShopAPI.DTOs
 {
     public class ProductDTO
     {

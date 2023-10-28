@@ -11,7 +11,7 @@ using ShopAPI.Data;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231026123511_InitialDatabase")]
+    [Migration("20231027122111_InitialDatabase")]
     partial class InitialDatabase
     {
         /// <inheritdoc />

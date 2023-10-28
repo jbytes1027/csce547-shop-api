@@ -1,10 +1,10 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
+using ShopAPI.Services;
 
 using System.Runtime;
 
@@ -14,10 +14,12 @@ namespace ShopAPI.Controllers
     [ApiController]
     public class ShopController : ControllerBase
     {
+        private readonly ICartService _cartService;
         private readonly IProductService _productService;
 
-        public ShopController(IProductService productService)
+        public ShopController(ICartService cartService, IProductService productService)
         {
+            _cartService = cartService;
             _productService = productService;
         }
 
@@ -33,7 +35,7 @@ namespace ShopAPI.Controllers
             }
 
             return Ok(products.ModelsToDTO());
-        }   
+        }
 
         // GET: api/Item/Filter
         [HttpGet("Item/Filter/{category}")]
@@ -165,7 +167,63 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Expiration date field empty");
             }
+
             return Ok("Payment processed");
+        }
+
+        [HttpPost]
+        [Route("AddItemToCart/{cartId}")]
+        public async Task<ActionResult<CartItemDTO>> AddItemToCart([FromRoute] int cartId, [FromBody] AddItemDTO item)
+        {
+            Product? product = await _productService.GetProductAsync(item.Id);
+
+            if (product is null)
+            {
+                return NotFound();
+            }
+
+            await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
+
+            ProductDTO productDTO = product.ModelToDTO();
+            CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
+
+            return Ok(cartItemDTO);
+        }
+
+        [HttpGet]
+        [Route("GetCart/{cartId}")]
+        public async Task<ActionResult<CartDTO>> GetCart(int cartId)
+        {
+            List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
+            var totals = Calculate.Totals(cartItems);
+
+            // Convert cartItems to cartItemsDTOs
+            List<CartItemDTO> cartItemDTOs = new(cartItems.Count);
+            foreach (var cartItem in cartItems)
+            {
+                CartItemDTO cartItemDTO = new(cartItem.Product.ModelToDTO(), cartItem.Quantity);
+                cartItemDTOs.Add(cartItemDTO);
+            }
+
+            CartDTO cartDTO = new()
+            {
+                Id = cartId,
+                Items = cartItemDTOs,
+                Totals = totals.ToDTO()
+            };
+
+            return Ok(cartDTO);
+        }
+
+        [HttpGet]
+        [Route("GetTotals/{cartId}")]
+        public async Task<ActionResult<TotalsDTO>> GetTotals(int cartId)
+        {
+            List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
+
+            var totals = Calculate.Totals(items);
+
+            return Ok(totals.ToDTO());
         }
     }
 }
