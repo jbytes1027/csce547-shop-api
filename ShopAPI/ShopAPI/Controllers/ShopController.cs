@@ -6,6 +6,9 @@ using ShopAPI.Mappers;
 using ShopAPI.Models;
 using ShopAPI.Services;
 
+using System.Runtime;
+using System.Runtime.InteropServices.JavaScript;
+
 namespace ShopAPI.Controllers
 {
     [Route("api")]
@@ -121,6 +124,84 @@ namespace ShopAPI.Controllers
 
             return NoContent();
         }
+        
+        // POST: api/processpayment
+        [HttpPost("ProcessPayment")]
+        public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Invalid Card details");
+            }
+
+            // Checks if cart exists
+            var cart = await _cartService.GetCartItemsAsync(dto.CartId);
+            if (cart == null)
+            {
+                return BadRequest("Cart does not exist");
+            }
+            
+            // Field checking
+            if (dto.CardNumber.ToString().Length != 16)
+            {
+                return BadRequest("Card length incorrect");
+            }
+
+            if (dto.Cvv.ToString().Length != 3)
+            {
+                return BadRequest("CVV length incorrect");
+            }
+
+            if (string.IsNullOrEmpty(dto.Cvv.ToString()))
+            {
+                return BadRequest("CVV field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CardHolderName))
+            {
+                return BadRequest("Holder name field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CartId.ToString()))
+            {
+                return BadRequest("Card ID field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.CardNumber.ToString()))
+            {
+                return BadRequest("Card Number field empty");
+            }
+
+            if (string.IsNullOrEmpty(dto.Exp))
+            {
+                return BadRequest("Expiration date field empty");
+            }
+
+            /* 
+            // TODO(epadams) Checking date more thoroughly, maybe split
+            try
+            {
+                var date = DateTime.Parse(dto.Exp).ToString("MM/y");
+                Console.WriteLine(date);
+            }
+            catch (FormatException)
+            {
+                return BadRequest("Unable to parse date");
+            }
+            */
+            
+            // Gets total with tax
+            var totals = Calculate.Totals(cart);
+            decimal returnTotal = 0;
+            foreach (var t in totals)
+            {
+                if (t.Type == TotalType.TaxTotal)
+                {
+                    returnTotal = t.Value;
+                }
+            }
+            return Ok("Payment processed for " + returnTotal);
+        }
 
         [HttpPost]
         [Route("AddItemToCart/{cartId}")]
@@ -172,8 +253,7 @@ namespace ShopAPI.Controllers
         {
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
-            var totals = Calculate.Totals(items);
-
+            var totals = Calculate.Totals(items); 
             return Ok(totals.ToDTO());
         }
     }

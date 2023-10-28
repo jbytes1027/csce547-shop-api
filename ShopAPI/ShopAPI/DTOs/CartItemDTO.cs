@@ -10,7 +10,6 @@ namespace ShopAPI.DTOs
             Name = productDTO.Name;
             Category = productDTO.Category;
             Price = productDTO.Price;
-            Description = productDTO.Description;
             Manufacturer = productDTO.Manufacturer;
             Details = productDTO.Details;
         }
