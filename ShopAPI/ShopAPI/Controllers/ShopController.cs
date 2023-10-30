@@ -4,10 +4,6 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
-using ShopAPI.Services;
-
-using System.Runtime;
-using System.Runtime.InteropServices.JavaScript;
 
 namespace ShopAPI.Controllers
 {
@@ -124,7 +120,7 @@ namespace ShopAPI.Controllers
 
             return NoContent();
         }
-        
+
         // POST: api/processpayment
         [HttpPost("ProcessPayment")]
         public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
@@ -140,7 +136,7 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Cart does not exist");
             }
-            
+
             // Field checking
             if (dto.CardNumber.ToString().Length != 16)
             {
@@ -177,7 +173,7 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            /* 
+            /*
             // TODO(epadams) Checking date more thoroughly, maybe split
             try
             {
@@ -189,18 +185,8 @@ namespace ShopAPI.Controllers
                 return BadRequest("Unable to parse date");
             }
             */
-            
-            // Gets total with tax
-            var totals = Calculate.Totals(cart);
-            decimal returnTotal = 0;
-            foreach (var t in totals)
-            {
-                if (t.Type == TotalType.TaxTotal)
-                {
-                    returnTotal = t.Value;
-                }
-            }
-            return Ok("Payment processed for " + returnTotal);
+
+            return Ok("Payment processed for " + Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal);
         }
 
         [HttpPost]
@@ -227,21 +213,13 @@ namespace ShopAPI.Controllers
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
             List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
-            var totals = Calculate.Totals(cartItems);
-
-            // Convert cartItems to cartItemsDTOs
-            List<CartItemDTO> cartItemDTOs = new(cartItems.Count);
-            foreach (var cartItem in cartItems)
-            {
-                CartItemDTO cartItemDTO = new(cartItem.Product.ModelToDTO(), cartItem.Quantity);
-                cartItemDTOs.Add(cartItemDTO);
-            }
+            var bill = Calculate.DefaultBill(cartItems);
 
             CartDTO cartDTO = new()
             {
                 Id = cartId,
-                Items = cartItemDTOs,
-                Totals = totals.ToDTO()
+                Items = cartItems.ToDTO(),
+                Totals = bill.GetTotalsDTO(),
             };
 
             return Ok(cartDTO);
@@ -253,8 +231,8 @@ namespace ShopAPI.Controllers
         {
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
-            var totals = Calculate.Totals(items); 
-            return Ok(totals.ToDTO());
+            var bill = Calculate.DefaultBill(items);
+            return Ok(bill.GetTotalsDTO());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ShopAPI.DTOs;
+using ShopAPI.Helpers;
 using ShopAPI.Models;
 
 namespace ShopAPI.Mappers
@@ -61,14 +62,14 @@ namespace ShopAPI.Mappers
             return dto;
         }
 
-        public static TotalsDTO ToDTO(this List<Total> totals)
+        public static TotalsDTO GetTotalsDTO(this Bill bill)
         {
-            TotalsDTO totalsDTO = new();
-            foreach (var total in totals)
+            return new TotalsDTO()
             {
-                totalsDTO.Add(total.Type.ToString(), total.Value);
-            }
-            return totalsDTO;
+                BaseTotal = bill.GetTotalWithoutSurcharges(),
+                BundleTotal = bill.GetTotalWithoutTaxes(),
+                TaxTotal = bill.GetTotalWithTaxes(),
+            };
         }
 
         /// <summary>
@@ -94,5 +95,17 @@ namespace ShopAPI.Mappers
             return details;
         }
 
+        public static List<CartItemDTO> ToDTO(this List<CartItem> cartItems)
+        {
+            List<CartItemDTO> cartItemDTOs = new(cartItems.Count);
+            foreach (var cartItem in cartItems)
+            {
+                cartItemDTOs.Add(
+                    new CartItemDTO(cartItem.Product.ModelToDTO(), cartItem.Quantity)
+                );
+            }
+
+            return cartItemDTOs;
+        }
     }
 }
