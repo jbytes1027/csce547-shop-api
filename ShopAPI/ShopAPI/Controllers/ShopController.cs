@@ -186,17 +186,7 @@ namespace ShopAPI.Controllers
             }
             */
 
-            // Gets total with tax
-            var totals = Calculate.Totals(cart);
-            decimal returnTotal = 0;
-            foreach (var t in totals)
-            {
-                if (t.Type == TotalType.TaxTotal)
-                {
-                    returnTotal = t.Value;
-                }
-            }
-            return Ok("Payment processed for " + returnTotal);
+            return Ok("Payment processed for " + Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal);
         }
 
         [HttpPost]
@@ -223,21 +213,13 @@ namespace ShopAPI.Controllers
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
             List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
-            var totals = Calculate.Totals(cartItems);
-
-            // Convert cartItems to cartItemsDTOs
-            List<CartItemDTO> cartItemDTOs = new(cartItems.Count);
-            foreach (var cartItem in cartItems)
-            {
-                CartItemDTO cartItemDTO = new(cartItem.Product.ModelToDTO(), cartItem.Quantity);
-                cartItemDTOs.Add(cartItemDTO);
-            }
+            var bill = Calculate.DefaultBill(cartItems);
 
             CartDTO cartDTO = new()
             {
                 Id = cartId,
-                Items = cartItemDTOs,
-                Totals = totals.ToDTO()
+                Items = cartItems.ToDTO(),
+                Totals = bill.GetTotalsDTO(),
             };
 
             return Ok(cartDTO);
@@ -249,8 +231,8 @@ namespace ShopAPI.Controllers
         {
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
-            var totals = Calculate.Totals(items);
-            return Ok(totals.ToDTO());
+            var bill = Calculate.DefaultBill(items);
+            return Ok(bill.GetTotalsDTO());
         }
     }
 }

@@ -1,98 +1,63 @@
+using ShopAPI.DTOs;
 using ShopAPI.Models;
 
 namespace ShopAPI.Helpers
 {
     public static class Calculate
     {
-        // Default total calculator with premade surcharges
-        public static List<Total> Totals(List<CartItem> items)
-        {
-            List<ISurchargeCalculator> surchargeCalculators = new()
-            {
-                new SalesTaxSurchargeCalculator(0.07)
-            };
-
-            return Totals(items, surchargeCalculators);
-        }
-
-        public static List<Total> Totals(List<CartItem> items, List<ISurchargeCalculator> surchargeCalculators)
-        {
-            List<TotalType> totalsToCalculate = new()
-            {
-                TotalType.BaseTotal,
-                TotalType.BundleTotal,
-                TotalType.TaxTotal
-            };
-
-            List<Total> totals = new();
-            foreach (var totalToCalculate in totalsToCalculate)
-            {
-                List<ISurchargeCalculator> currSurchargeCalculators = new();
-                switch (totalToCalculate)
-                {
-                    case TotalType.BaseTotal:
-                        // No calculator to add
-                        break;
-                    case TotalType.BundleTotal:
-                        // Add all bundle discounts
-                        currSurchargeCalculators.AddRange(
-                            surchargeCalculators.Where(c => c.Type == TotalType.BundleTotal)
-                        );
-                        break;
-                    case TotalType.TaxTotal:
-                        // Add taxes, and everything else
-                        currSurchargeCalculators = surchargeCalculators;
-                        break;
-                    default:
-                        break;
-                }
-
-                var bill = Bill(items, currSurchargeCalculators);
-                totals.Add(new Total()
-                {
-                    Type = totalToCalculate,
-                    Value = bill.GetTotalCost(),
-                });
-            }
-
-            return totals;
-        }
-
-        public static Bill Bill(List<CartItem> items, List<ISurchargeCalculator> surchargeCalculators)
+        public static Bill DefaultBill(List<CartItem> items)
         {
             Bill bill = new()
             {
                 Items = items
             };
 
-            foreach (var surchargeCalc in surchargeCalculators)
-            {
-                surchargeCalc.AddCalculatedTo(bill);
-            }
+            new SalesTaxSurchargeCalculator(0.07).AddCalculatedTo(bill);
 
             return bill;
         }
+
     }
 
     public class Bill
     {
         public List<CartItem> Items;
-        public List<Surcharge> Surcharges;
+        public List<Surcharge> BundleSurcharges;
+        public List<Surcharge> TaxSurcharges;
 
         public Bill()
         {
             Items = new();
-            Surcharges = new();
+            BundleSurcharges = new();
+            TaxSurcharges = new();
         }
 
-        public decimal GetTotalCost()
+        public decimal GetTotalWithoutSurcharges()
         {
             decimal sumTotal = 0;
             foreach (var item in Items)
             {
                 sumTotal += item.Quantity * item.Product.Price;
             }
-            foreach (var surcharge in Surcharges)
+            return sumTotal;
+        }
+
+        public decimal GetTotalWithoutTaxes()
+        {
+            decimal sumTotal = 0;
+            sumTotal += GetTotalWithoutSurcharges();
+            foreach (var surcharge in BundleSurcharges)
+            {
+                sumTotal += surcharge.Cost;
+            }
+            return sumTotal;
+        }
+
+        public decimal GetTotalWithTaxes()
+        {
+            decimal sumTotal = 0;
+            sumTotal += GetTotalWithoutTaxes();
+            foreach (var surcharge in TaxSurcharges)
             {
                 sumTotal += surcharge.Cost;
             }
@@ -104,8 +69,6 @@ namespace ShopAPI.Helpers
     {
         public double TaxRate;
 
-        public TotalType Type { get => TotalType.TaxTotal; }
-
         public SalesTaxSurchargeCalculator(double taxRate)
         {
             TaxRate = taxRate;
@@ -113,16 +76,15 @@ namespace ShopAPI.Helpers
 
         public void AddCalculatedTo(Bill bill)
         {
-            decimal taxCharge = bill.GetTotalCost() * (decimal)TaxRate;
+            decimal taxCharge = bill.GetTotalWithTaxes() * (decimal)TaxRate;
             Surcharge taxSurcharge = new() { Cost = taxCharge, Description = "Sales Tax" };
 
-            bill.Surcharges.Add(taxSurcharge);
+            bill.TaxSurcharges.Add(taxSurcharge);
         }
     }
 
     public interface ISurchargeCalculator
     {
-        public TotalType Type { get; }
         public void AddCalculatedTo(Bill bill);
     }
 
