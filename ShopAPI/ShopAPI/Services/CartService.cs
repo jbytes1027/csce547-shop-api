@@ -79,7 +79,7 @@ public class CartService : ICartService
 
         _context.SaveChanges();
 
-        return Task.FromResult(returnedItem);
+        return Task.FromResult<CartItem?>(returnedItem);
     }
 
 
