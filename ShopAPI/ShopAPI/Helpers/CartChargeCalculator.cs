@@ -1,4 +1,3 @@
-using ShopAPI.DTOs;
 using ShopAPI.Models;
 
 namespace ShopAPI.Helpers
