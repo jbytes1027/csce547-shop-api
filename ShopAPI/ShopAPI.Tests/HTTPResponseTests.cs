@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc.Testing;
 using ShopAPI.DTOs;
 using System.Net;
@@ -307,7 +306,7 @@ namespace ShopAPI.Tests
             // Parse Cart Total for comparison
             string jsonContentTotal = await response.Content.ReadAsStringAsync();
             JsonDocument jsonDocumentTotal = JsonDocument.Parse(jsonContentTotal);
-            int baseTotal = Convert.ToInt32(jsonDocumentTotal.RootElement.GetProperty("BaseTotal").ToString());
+            int baseTotal = Convert.ToInt32(jsonDocumentTotal.RootElement.GetProperty("baseTotal").ToString());
 
             // Assert
             Assert.Equal(expectedBaseTotal, baseTotal);
