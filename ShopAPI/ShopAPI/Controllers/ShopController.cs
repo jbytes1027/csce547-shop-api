@@ -124,7 +124,7 @@ namespace ShopAPI.Controllers
 
             return NoContent();
         }
-        
+
         // POST: api/processpayment
         [HttpPost("ProcessPayment")]
         public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
@@ -140,7 +140,7 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Cart does not exist");
             }
-            
+
             // Field checking
             if (dto.CardNumber.ToString().Length != 16)
             {
@@ -177,7 +177,7 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            /* 
+            /*
             // TODO(epadams) Checking date more thoroughly, maybe split
             try
             {
@@ -189,7 +189,7 @@ namespace ShopAPI.Controllers
                 return BadRequest("Unable to parse date");
             }
             */
-            
+
             // Gets total with tax
             var totals = Calculate.Totals(cart);
             decimal returnTotal = 0;
@@ -253,7 +253,7 @@ namespace ShopAPI.Controllers
         {
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
-            var totals = Calculate.Totals(items); 
+            var totals = Calculate.Totals(items);
             return Ok(totals.ToDTO());
         }
     }
