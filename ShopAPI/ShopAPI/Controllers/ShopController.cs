@@ -4,10 +4,6 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
-using ShopAPI.Services;
-
-using System.Runtime;
-using System.Runtime.InteropServices.JavaScript;
 
 namespace ShopAPI.Controllers
 {
