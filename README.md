@@ -26,3 +26,6 @@ CONNECTION_STRING="Host=localhost; Database=shop_dev; Username=dev; Password=dev
 ```
 
 Alternatively, add the connection string to the environment variables.
+
+### Deployed API
+https://csce547shopapi.azurewebsites.net/api
