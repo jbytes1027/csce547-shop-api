@@ -25,7 +25,7 @@ namespace ShopAPI.Controllers
         [HttpGet("Item/GetAllItems")]
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _productService.GetProdcutsAsync(null, null);
+            var products = await _productService.GetProductsAsync(null, null);
 
             if (products == null || !products.Any())
             {
@@ -44,7 +44,7 @@ namespace ShopAPI.Controllers
                 return BadRequest("Invalid category");
             }
 
-            var products = await _productService.GetProdcutsAsync(productCategory, searchTerm);
+            var products = await _productService.GetProductsAsync(productCategory, searchTerm);
 
             if (products == null || !products.Any())
             {
@@ -68,7 +68,7 @@ namespace ShopAPI.Controllers
             return Ok(product.ModelToDTO());
         }
 
-        // POST: api/item
+        // POST: api/Item
         [HttpPost]
         [Route("Item")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
@@ -190,6 +190,7 @@ namespace ShopAPI.Controllers
             return Ok("Payment processed for " + Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal);
         }
 
+        // POST: api/AddItemToCart/{cartId}
         [HttpPost]
         [Route("AddItemToCart/{cartId}")]
         public async Task<ActionResult<CartItemDTO>> AddItemToCart([FromRoute] int cartId, [FromBody] AddItemDTO item)
@@ -209,6 +210,7 @@ namespace ShopAPI.Controllers
             return Ok(cartItemDTO);
         }
 
+        // GET: api/GetCart/{cartId}
         [HttpGet]
         [Route("GetCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
@@ -226,6 +228,7 @@ namespace ShopAPI.Controllers
             return Ok(cartDTO);
         }
 
+        // GET: api/GetTotals/{cartId}
         [HttpGet]
         [Route("GetTotals/{cartId}")]
         public async Task<ActionResult<TotalsDTO>> GetTotals(int cartId)
@@ -236,6 +239,7 @@ namespace ShopAPI.Controllers
             return Ok(bill.GetTotalsDTO());
         }
 
+        // GET: api/GetBill/{cartId}
         [HttpGet]
         [Route("GetBill/{cartId}")]
         public async Task<ActionResult<Bill>> GetBill(int cartId)
@@ -243,6 +247,7 @@ namespace ShopAPI.Controllers
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
             var bill = Calculate.DefaultBill(items);
+            Console.WriteLine(bill);
             return Ok(bill.ToJson());
         }
     }

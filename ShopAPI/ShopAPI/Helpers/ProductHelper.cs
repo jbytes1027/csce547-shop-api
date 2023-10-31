@@ -85,7 +85,7 @@ namespace ShopAPI.Helpers
                  
                 case Category.PowerSupply:
                     var powerSupplyProperties = typeof(PowerSupply).GetProperties();
-                    requiredProperties =powerSupplyProperties.Select(p => p.Name);
+                    requiredProperties = powerSupplyProperties.Select(p => p.Name);
                     break;
                  
                 default:

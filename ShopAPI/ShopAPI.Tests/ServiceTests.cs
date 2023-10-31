@@ -3,13 +3,22 @@ using ShopAPI.Services;
 using ShopAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Models;
+using Xunit.Abstractions;
 
 namespace ShopAPI.Tests
 {
     public class ServiceTests
     {
+        // Use in place of Console.WriteLine for logging
+        private readonly ITestOutputHelper output;
+
+        public ServiceTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
-        public void ProductServiceRetrieveCpu()
+        public async void ProductServiceRetrieveCpu()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -30,30 +39,30 @@ namespace ShopAPI.Tests
                 Manufacturer = "Intel",
                 NormalizedName = "Intel i5-6400"
             });
-            IProductService _productService = new ProductService(context);
-            
+            IProductService productService = new ProductService(context);
+
             // Act
-            var result = _productService.GetProductAsync(1);
-            
+            var result = await productService.GetProductAsync(1);
+
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(1, result.Result.Id);
-            Assert.Equal("i5-6400", result.Result.Name);
-            Assert.Equal("Intel", result.Result.Manufacturer);
-            Assert.Equal("Intel i5-6400", result.Result.NormalizedName);
-            Assert.Equal(300, result.Result.Price);
-            Assert.Equal(Category.Cpu, result.Result.Category);
+            Assert.Equal(1, result.Id);
+            Assert.Equal("i5-6400", result.Name);
+            Assert.Equal("Intel", result.Manufacturer);
+            Assert.Equal("Intel i5-6400", result.NormalizedName);
+            Assert.Equal(300, result.Price);
+            Assert.Equal(Category.Cpu, result.Category);
         }
         
         [Fact]
-        public void ProductServiceAddCpu()
+        public async void ProductServiceAddCpu()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                           .UseInMemoryDatabase(databaseName: "shop_dev")
                           .Options;
             var context = new ApplicationDbContext(options);
-            var _cpu = new Cpu()
+            var cpu = new Cpu()
             {
                 Id = 2,
                 Name = "i5-6400",
@@ -68,20 +77,20 @@ namespace ShopAPI.Tests
             dict.Add("Cores","4");
             dict.Add("Series","6th Gen");
             dict.Add("IntegratedGraphics","true");
-            IProductService _productService = new ProductService(context);
-            
+            IProductService productService = new ProductService(context);
+
             // Act
-            _productService.CreateProductAsync(_cpu, dict);
-            var result = _productService.GetProductAsync(2);
+            await productService.CreateProductAsync(cpu, dict);
+            var result = await productService.GetProductAsync(2);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(_cpu.Id, result.Result.Id);
-            Assert.Equal(_cpu.Name, result.Result.Name);
-            Assert.Equal(_cpu.Manufacturer, result.Result.Manufacturer);
-            Assert.Equal(_cpu.NormalizedName, result.Result.NormalizedName);
-            Assert.Equal(_cpu.Price, result.Result.Price);
-            Assert.Equal(_cpu.Category, result.Result.Category);
+            Assert.Equal(cpu.Id, result.Id);
+            Assert.Equal(cpu.Name, result.Name);
+            Assert.Equal(cpu.Manufacturer, result.Manufacturer);
+            Assert.Equal(cpu.NormalizedName, result.NormalizedName);
+            Assert.Equal(cpu.Price, result.Price);
+            Assert.Equal(cpu.Category, result.Category);
         }
         
         /* not yet implemented in service
@@ -94,31 +103,136 @@ namespace ShopAPI.Tests
         }
         */
 
+        [Fact]
+        public async void ProductServiceRemoveCpu()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                          .UseInMemoryDatabase(databaseName: "shop_dev")
+                          .Options;
+            var context = new ApplicationDbContext(options);
+
+            context.Set<Cpu>().Add(new Cpu()
+            {
+                Socket = "1151",
+                Cores = 4,
+                Series = "Skylake",
+                IntegratedGraphics = true,
+                Id = 1,
+                Name = "i5-6400",
+                Category = Category.Cpu,
+                Price = 300,
+                Manufacturer = "Intel",
+                NormalizedName = "Intel i5-6400"
+            });
+            IProductService productService = new ProductService(context);
+
+            // Act
+            await productService.RemoveProductAsync(1);
+            var result = await productService.GetProductAsync(1);
+
+            // Assert
+            Assert.Null(result);
+        }
+        
+        [Fact]
+        public async void CartServiceAddItemToCart()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                          .UseInMemoryDatabase(databaseName: "shop_dev")
+                          .Options;
+            var context = new ApplicationDbContext(options);
+            
+            Cpu cpu = new Cpu()
+            {
+                Socket = "1151",
+                Cores = 4,
+                Series = "Skylake",
+                IntegratedGraphics = true,
+                Id = 1,
+                Name = "i5-6400",
+                Category = Category.Cpu,
+                Price = 300,
+                Manufacturer = "Intel",
+                NormalizedName = "Intel i5-6400"
+            };
+            context.Set<Cpu>().Add(cpu);
+
+            ICartService cartService = new CartService(context);
+
+            // Act
+            // Defaults to quantity of 1
+            await cartService.AddItemAsync(1, 1);
+            var cartList = cartService.GetCartItemsAsync(1);
+            var result = cartList.Result[0];
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.CartId);
+            Assert.Equal(1, result.ProductId);
+            Assert.Equal(1, result.Quantity);
+            Assert.Equal(cpu.Id,result.Product.Id);
+            Assert.Equal(cpu.Name, result.Product.Name);
+            Assert.Equal(cpu.Manufacturer, result.Product.Manufacturer);
+            Assert.Equal(cpu.NormalizedName, result.Product.NormalizedName);
+            Assert.Equal(cpu.Price, result.Product.Price);
+            Assert.Equal(cpu.Category, result.Product.Category);
+        }
+
+        [Fact]
+        public async void CartServiceRemoveItemFromCart()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                              .UseInMemoryDatabase(databaseName: "shop_dev")
+                              .Options;
+            var context = new ApplicationDbContext(options);
+
+            Cpu cpu = new Cpu()
+            {
+                Socket = "1151",
+                Cores = 4,
+                Series = "Skylake",
+                IntegratedGraphics = true,
+                Id = 1,
+                Name = "i5-6400",
+                Category = Category.Cpu,
+                Price = 300,
+                Manufacturer = "Intel",
+                NormalizedName = "Intel i5-6400"
+            };
+            context.Set<Cpu>().Add(cpu);
+            ICartService cartService = new CartService(context);
+
+            // Act
+            /* Case: Removing 1 from quantity of 1
+            {
+                await cartService.AddItemAsync(1, 1, 1);
+                await cartService.RemoveItemAsync(1, 1, 1);
+                var cartList = cartService.GetCartItemsAsync(1);
+                var result = cartList.Result.Count;
+                Assert.Equal(0, result);
+            }
+            */
+            await cartService.AddItemAsync(1, 1, 3);
+            await cartService.RemoveItemAsync(1, 1, 1);
+            var cartList = await cartService.GetCartItemsAsync(1);
+            var result = cartList[0];
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.CartId);
+            Assert.Equal(1, result.ProductId);
+            Assert.Equal(cpu.Id,result.Product.Id);
+            Assert.Equal(cpu.Name, result.Product.Name);
+            Assert.Equal(cpu.Manufacturer, result.Product.Manufacturer);
+            Assert.Equal(cpu.NormalizedName, result.Product.NormalizedName);
+            Assert.Equal(cpu.Price, result.Product.Price);
+            Assert.Equal(cpu.Category, result.Product.Category);
+        }
+
         /*
-        [Fact]
-        public void ProductServiceRemoveCpu()
-        {
-            // Arrange
-            // Act
-            // Assert
-        }
-
-        [Fact]
-        public void CartServiceAddItemToCart()
-        {
-            // Arrange
-            // Act
-            // Assert
-        }
-
-        [Fact]
-        public void CartServiceRemoveItemFromCart()
-        {
-            // Arrange
-            // Act
-            // Assert
-        }
-
         [Fact]
         public void CartServiceGetCart()
         {
