@@ -202,6 +202,11 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
+            if (item.Quantity < 0)
+            {
+                return BadRequest("Quantity must be positive");
+            }
+
             await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
 
             ProductDTO productDTO = product.ModelToDTO();
