@@ -224,8 +224,6 @@ namespace ShopAPI.Tests
             Assert.NotNull(result);
             Assert.Equal(1, result.CartId);
             Assert.Equal(1, result.ProductId);
-            // TODO FIX THIS, THIS SHOULD PASS
-            // Assert.Equal(2, result.Quantity);
             Assert.Equal(cpu.Id,result.Product.Id);
             Assert.Equal(cpu.Name, result.Product.Name);
             Assert.Equal(cpu.Manufacturer, result.Product.Manufacturer);
