@@ -23,7 +23,7 @@ namespace ShopAPI.Services
         /// <param name="category">The optional category to filter products.</param>
         /// <param name="searchTerm">The optional search term to filter products by name or description.</param>
         /// <returns>A collection of products matching the specified criteria.</returns>
-        public async Task<IEnumerable<Product>?> GetProdcutsAsync(Category? category, string? searchTerm)
+        public async Task<IEnumerable<Product>?> GetProductsAsync(Category? category, string? searchTerm)
         {
             IQueryable<Product> query = _context.Products;
 
