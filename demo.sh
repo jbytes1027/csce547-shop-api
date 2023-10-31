@@ -3,6 +3,7 @@ dotnet ef database drop; dotnet ef database update
 
 # http command from HTTPie
 
+# ITEMS
 # Add some buyable items
 echo '{
     "name": "AMD Ryzen Threadripper PRO 7995WX",
@@ -64,6 +65,7 @@ http -v GET ":5148/api/Item/Filter/cpu?searchTerm=intel"
 # Get a specific items details
 http -v GET ":5148/api/Item/3"
 
+# CART
 # 1 Cpu
 http -v POST ":5148/api/AddItemToCart/1" Id:=2 Quantity:=1
 # 2 Coolers
@@ -77,7 +79,13 @@ http -v GET ":5148/api/GetCart/1"
 # Get just the totals
 http -v GET ":5148/api/GetTotals/1"
 
-# Pay
+# Add some more fans
+http -v POST ":5148/api/AddItemToCart/1" Id:=3 Quantity:=20
+
+# Get the bill
+http -v GET ":5148/api/GetBill/1"
+
+# PAY
 echo '{
     "CartId": 1,
     "CardNumber": 3782822463100053,
@@ -89,5 +97,5 @@ echo '{
 # Delete an item from the inventory
 http -v DELETE ":5148/api/Item/2"
 
-# Test
+# TEST
 dotnet test

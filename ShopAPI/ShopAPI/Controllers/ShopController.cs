@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
@@ -233,6 +234,16 @@ namespace ShopAPI.Controllers
 
             var bill = Calculate.DefaultBill(items);
             return Ok(bill.GetTotalsDTO());
+        }
+
+        [HttpGet]
+        [Route("GetBill/{cartId}")]
+        public async Task<ActionResult<Bill>> GetBill(int cartId)
+        {
+            List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
+
+            var bill = Calculate.DefaultBill(items);
+            return Ok(bill.ToJson());
         }
     }
 }

@@ -12,6 +12,7 @@ namespace ShopAPI.Helpers
             };
 
             new SalesTaxSurchargeCalculator(0.07).AddCalculatedTo(bill);
+            new BulkDiscountCalculator(quantityThreshold: 10, discountPercent: 0.05).AddCalculatedTo(bill);
 
             return bill;
         }
@@ -79,6 +80,37 @@ namespace ShopAPI.Helpers
             Surcharge taxSurcharge = new() { Cost = taxCharge, Description = "Sales Tax" };
 
             bill.TaxSurcharges.Add(taxSurcharge);
+        }
+    }
+
+    public class BulkDiscountCalculator : ISurchargeCalculator
+    {
+        public int QuantityThreshold;
+        public double DiscountPercent;
+
+        public BulkDiscountCalculator(int quantityThreshold, double discountPercent)
+        {
+            QuantityThreshold = quantityThreshold;
+            DiscountPercent = discountPercent;
+        }
+
+        public void AddCalculatedTo(Bill bill)
+        {
+            foreach (var item in bill.Items)
+            {
+                if (item.Quantity >= QuantityThreshold)
+                {
+                    decimal discount = -1 * item.Quantity * item.Product.Price * (decimal)DiscountPercent;
+
+                    bill.BundleSurcharges.Add(
+                        new Surcharge()
+                        {
+                            Cost = discount,
+                            Description = $"{DiscountPercent:N2}% Bulk Discount on {item.Product.Name}"
+                        }
+                    );
+                }
+            }
         }
     }
 
