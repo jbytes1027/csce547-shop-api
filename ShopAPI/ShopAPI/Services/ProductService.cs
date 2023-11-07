@@ -71,6 +71,8 @@ namespace ShopAPI.Services
                 }
             }
 
+            product.Price = Math.Round(product.Price, 2);
+
             // Add the product to the database
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
