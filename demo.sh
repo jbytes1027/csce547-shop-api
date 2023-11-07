@@ -66,11 +66,11 @@ http -v GET ":5148/api/Item/Filter/cpu?searchTerm=intel"
 http -v GET ":5148/api/Item/3"
 
 # Create a cart
-http -v POST ":5148/api/CreateNewCart/" name=cart1
+http -v POST ":5148/api/Cart/CreateNewCart/" name=cart1
 
 # CART
 # 1 Cpu
-http -v POST ":5148/api/AddItemToCart/1" Id:=2 Quantity:=1
+http -v POST ":5148/api/AddItemToCart/1" Id:=2 Quantity:=2
 # 2 Coolers
 http -v POST ":5148/api/AddItemToCart/1" Id:=3 Quantity:=2
 # 1 Motherboard
@@ -78,6 +78,9 @@ http -v POST ":5148/api/AddItemToCart/1" Id:=4 Quantity:=1
 
 # Get the cart
 http -v GET ":5148/api/GetCart/1"
+
+# Delete an item from the cart
+http -v DELETE ":5148/api/Cart/RemoveItem/1" ItemId:=2 Quantity:=1
 
 # Get just the totals
 http -v GET ":5148/api/GetTotals/1"

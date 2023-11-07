@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -274,6 +274,23 @@ namespace ShopAPI.Controllers
         {
             var newCart = await _cartService.CreateCartAsync(cart.Name);
             return Ok(newCart);
+        }
+
+        [HttpDelete]
+        [Route("Cart/RemoveItem/{cartId}")]
+        public async Task<ActionResult<CartDTO>> RemoveItemFromCart([FromRoute] int cartId, CartRemoveItemRequest request)
+        {
+            // If request quantity is not specified, remove all the items from the cart
+            request.Quantity ??= int.MaxValue;
+
+            var item = await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
+
+            if (item is null)
+            {
+                return NotFound();
+            }
+
+            return await GetCart(cartId);
         }
     }
 }
