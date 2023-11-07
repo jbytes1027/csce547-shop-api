@@ -14,6 +14,12 @@ public class CartService : ICartService
         _context = context;
     }
 
+    public Task<Cart> CreateCartAsync(string name)
+    {
+        var newCartEntity = _context.Carts.Add(new Cart() { Name = name });
+        return Task.FromResult(newCartEntity.Entity);
+    }
+
     public Task<CartItem> AddItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? prevItem = _context.CartItems.Find(cartId, itemId);

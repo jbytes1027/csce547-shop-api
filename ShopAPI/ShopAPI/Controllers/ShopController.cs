@@ -5,6 +5,7 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
+using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -254,6 +255,14 @@ namespace ShopAPI.Controllers
             var bill = Calculate.DefaultBill(items);
             Console.WriteLine(bill);
             return Ok(bill.ToJson());
+        }
+
+        [HttpPost]
+        [Route("CreateNewCart")]
+        public async Task<IActionResult> CreateNewCart(Cart cart)
+        {
+            var newCart = await _cartService.CreateCartAsync(cart.Name);
+            return Ok(newCart);
         }
     }
 }

@@ -46,10 +46,12 @@ namespace ShopAPI.Data
             modelBuilder.Entity<PowerSupply>()
                 .ToTable("PowerSupplies")
                 .HasBaseType<Product>();
-            
+
             base.OnModelCreating(modelBuilder);
         }
+
         public DbSet<Product> Products { get; set; }
+        public DbSet<Cart> Carts {get; set;}
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Cpu> CPUs { get; set; }
         public DbSet<Case> Cases { get; set; }
@@ -58,6 +60,6 @@ namespace ShopAPI.Data
         public DbSet<Memory> Memories { get; set; }
         public DbSet<Storage> Storages { get; set; }
         public DbSet<Motherboard> Motherboards { get; set; }
-        public DbSet<PowerSupply> PowerSupplies { get; set; }    
+        public DbSet<PowerSupply> PowerSupplies { get; set; }
     }
 }
