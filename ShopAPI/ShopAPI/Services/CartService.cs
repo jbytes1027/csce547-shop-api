@@ -21,7 +21,8 @@ public class CartService : ICartService
         return Task.FromResult(newCartEntity.Entity);
     }
 
-    public Task<CartItem> AddItemAsync(int cartId, int itemId, int quantity = 1)
+    /// <returns>The created Item or null if failed</returns>
+    public Task<CartItem?> AddItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? prevItem = _context.CartItems.Find(cartId, itemId);
 
@@ -36,6 +37,13 @@ public class CartService : ICartService
         }
         else
         {
+            // Then check if the cart exists
+            var cart = _context.Carts.Find(cartId);
+            if (cart is null)
+            {
+                return Task.FromResult<CartItem?>(null);
+            }
+
             // Then create a new item
             item = new()
             {
@@ -48,7 +56,7 @@ public class CartService : ICartService
         }
 
         _context.SaveChanges();
-        return Task.FromResult(item);
+        return Task.FromResult<CartItem?>(item);
     }
 
     public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1)

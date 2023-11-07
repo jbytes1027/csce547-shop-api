@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -208,7 +208,11 @@ namespace ShopAPI.Controllers
                 return BadRequest("Quantity must be positive");
             }
 
-            await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
+            var newItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
+            if (newItem is null)
+            {
+                return NotFound("Cart not found");
+            }
 
             ProductDTO productDTO = product.ModelToDTO();
             CartItemDTO cartItemDTO = new(productDTO, item.Quantity);

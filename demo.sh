@@ -65,6 +65,9 @@ http -v GET ":5148/api/Item/Filter/cpu?searchTerm=intel"
 # Get a specific items details
 http -v GET ":5148/api/Item/3"
 
+# Create a cart
+http -v POST ":5148/api/CreateNewCart/" name=cart1
+
 # CART
 # 1 Cpu
 http -v POST ":5148/api/AddItemToCart/1" Id:=2 Quantity:=1
