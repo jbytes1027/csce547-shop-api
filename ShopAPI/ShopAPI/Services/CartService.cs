@@ -97,4 +97,10 @@ public class CartService : ICartService
             .ToList();
         return Task.FromResult(cartItems);
     }
+
+    public Task<Cart?> GetCart(int cartId)
+    {
+        var cart = _context.Carts.Find(cartId);
+        return Task.FromResult(cart);
+    }
 }

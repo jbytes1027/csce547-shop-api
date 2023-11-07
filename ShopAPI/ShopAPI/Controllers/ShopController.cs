@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -221,12 +221,19 @@ namespace ShopAPI.Controllers
         [Route("GetCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
+            Cart? cart = await _cartService.GetCart(cartId);
+            if (cart is null)
+            {
+                return NotFound();
+            }
+
             List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
             var bill = Calculate.DefaultBill(cartItems);
 
             CartDTO cartDTO = new()
             {
                 Id = cartId,
+                Name = cart.Name,
                 Items = cartItems.ToDTO(),
                 Totals = bill.GetTotalsDTO(),
             };
