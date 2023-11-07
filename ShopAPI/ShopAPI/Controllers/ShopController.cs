@@ -5,6 +5,7 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
+using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -207,7 +208,11 @@ namespace ShopAPI.Controllers
                 return BadRequest("Quantity must be positive");
             }
 
-            await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
+            var newItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
+            if (newItem is null)
+            {
+                return NotFound("Cart not found");
+            }
 
             ProductDTO productDTO = product.ModelToDTO();
             CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
@@ -220,13 +225,19 @@ namespace ShopAPI.Controllers
         [Route("GetCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
-            List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
-            var bill = Calculate.DefaultBill(cartItems);
+            Cart? cart = await _cartService.GetCart(cartId);
+            if (cart is null)
+            {
+                return NotFound();
+            }
+
+            var bill = Calculate.DefaultBill(cart.Items);
 
             CartDTO cartDTO = new()
             {
                 Id = cartId,
-                Items = cartItems.ToDTO(),
+                Name = cart.Name,
+                Items = cart.Items.ToDTO(),
                 Totals = bill.GetTotalsDTO(),
             };
 
@@ -254,6 +265,31 @@ namespace ShopAPI.Controllers
             var bill = Calculate.DefaultBill(items);
             Console.WriteLine(bill);
             return Ok(bill.ToJson());
+        }
+
+        [HttpPost]
+        [Route("Cart/CreateNewCart")]
+        public async Task<IActionResult> CreateNewCart(Cart cart)
+        {
+            var newCart = await _cartService.CreateCartAsync(cart.Name);
+            return Ok(newCart);
+        }
+
+        [HttpDelete]
+        [Route("Cart/RemoveItem/{cartId}")]
+        public async Task<ActionResult<CartDTO>> RemoveItemFromCart([FromRoute] int cartId, CartRemoveItemRequest request)
+        {
+            // If request quantity is not specified, remove all the items from the cart
+            request.Quantity ??= int.MaxValue;
+
+            var item = await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
+
+            if (item is null)
+            {
+                return NotFound();
+            }
+
+            return await GetCart(cartId);
         }
     }
 }

@@ -14,7 +14,15 @@ public class CartService : ICartService
         _context = context;
     }
 
-    public Task<CartItem> AddItemAsync(int cartId, int itemId, int quantity = 1)
+    public Task<Cart> CreateCartAsync(string name)
+    {
+        var newCartEntity = _context.Carts.Add(new Cart() { Name = name });
+        _context.SaveChanges();
+        return Task.FromResult(newCartEntity.Entity);
+    }
+
+    /// <returns>The created Item or null if failed</returns>
+    public Task<CartItem?> AddItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? prevItem = _context.CartItems.Find(cartId, itemId);
 
@@ -29,6 +37,13 @@ public class CartService : ICartService
         }
         else
         {
+            // Then check if the cart exists
+            var cart = _context.Carts.Find(cartId);
+            if (cart is null)
+            {
+                return Task.FromResult<CartItem?>(null);
+            }
+
             // Then create a new item
             item = new()
             {
@@ -41,9 +56,10 @@ public class CartService : ICartService
         }
 
         _context.SaveChanges();
-        return Task.FromResult(item);
+        return Task.FromResult<CartItem?>(item);
     }
 
+    /// <returns>The removed item or null if failed</returns>
     public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? item = _context.CartItems.Find(cartId, itemId);
@@ -71,6 +87,7 @@ public class CartService : ICartService
         else
         {
             // Then the request is to remove some of the items
+            item.Quantity -= quantity;
             _context.CartItems.Update(item);
 
             // Update the amount the caller is told is removed
@@ -82,13 +99,6 @@ public class CartService : ICartService
         return Task.FromResult<CartItem?>(returnedItem);
     }
 
-
-    public Task<List<CartItem>> GetAllItemsAsync()
-    {
-        var cartItems = _context.CartItems.ToList();
-        return Task.FromResult(cartItems);
-    }
-
     public Task<List<CartItem>> GetCartItemsAsync(int cartId)
     {
         var cartItems = _context.CartItems
@@ -96,5 +106,15 @@ public class CartService : ICartService
             .Include(item => item.Product)
             .ToList();
         return Task.FromResult(cartItems);
+    }
+
+    public async Task<Cart?> GetCart(int cartId)
+    {
+        var cart = _context.Carts.Find(cartId);
+        if (cart is not null)
+        {
+            cart.Items = await GetCartItemsAsync(cartId);
+        }
+        return cart;
     }
 }
