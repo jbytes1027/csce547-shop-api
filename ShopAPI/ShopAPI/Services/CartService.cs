@@ -88,13 +88,6 @@ public class CartService : ICartService
         return Task.FromResult<CartItem?>(returnedItem);
     }
 
-
-    public Task<List<CartItem>> GetAllItemsAsync()
-    {
-        var cartItems = _context.CartItems.ToList();
-        return Task.FromResult(cartItems);
-    }
-
     public Task<List<CartItem>> GetCartItemsAsync(int cartId)
     {
         var cartItems = _context.CartItems
