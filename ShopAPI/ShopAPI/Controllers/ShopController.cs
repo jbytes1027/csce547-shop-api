@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -269,7 +269,7 @@ namespace ShopAPI.Controllers
         }
 
         [HttpPost]
-        [Route("CreateNewCart")]
+        [Route("Cart/CreateNewCart")]
         public async Task<IActionResult> CreateNewCart(Cart cart)
         {
             var newCart = await _cartService.CreateCartAsync(cart.Name);
