@@ -39,7 +39,7 @@ namespace ShopAPI.Helpers
             {
                 sumTotal += item.Quantity * item.Product.Price;
             }
-            return sumTotal;
+            return Math.Round(sumTotal, 2);
         }
 
         public decimal GetTotalWithoutTaxes()
@@ -50,7 +50,7 @@ namespace ShopAPI.Helpers
             {
                 sumTotal += surcharge.Cost;
             }
-            return sumTotal;
+            return Math.Round(sumTotal, 2);
         }
 
         public decimal GetTotalWithTaxes()
@@ -61,7 +61,7 @@ namespace ShopAPI.Helpers
             {
                 sumTotal += surcharge.Cost;
             }
-            return sumTotal;
+            return Math.Round(sumTotal, 2);
         }
     }
 
