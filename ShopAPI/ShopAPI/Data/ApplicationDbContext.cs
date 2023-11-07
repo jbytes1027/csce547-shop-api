@@ -47,11 +47,17 @@ namespace ShopAPI.Data
                 .ToTable("PowerSupplies")
                 .HasBaseType<Product>();
 
+            modelBuilder.Entity<CartItem>()
+                .HasOne(e => e.Cart);
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(e => e.Product);
+
             base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Cart> Carts {get; set;}
+        public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Cpu> CPUs { get; set; }
         public DbSet<Case> Cases { get; set; }
