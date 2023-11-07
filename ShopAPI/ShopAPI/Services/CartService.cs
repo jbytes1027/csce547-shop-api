@@ -86,6 +86,7 @@ public class CartService : ICartService
         else
         {
             // Then the request is to remove some of the items
+            item.Quantity -= quantity;
             _context.CartItems.Update(item);
 
             // Update the amount the caller is told is removed
