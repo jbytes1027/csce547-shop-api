@@ -59,6 +59,7 @@ public class CartService : ICartService
         return Task.FromResult<CartItem?>(item);
     }
 
+    /// <returns>The removed item or null if failed</returns>
     public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1)
     {
         CartItem? item = _context.CartItems.Find(cartId, itemId);
@@ -107,9 +108,13 @@ public class CartService : ICartService
         return Task.FromResult(cartItems);
     }
 
-    public Task<Cart?> GetCart(int cartId)
+    public async Task<Cart?> GetCart(int cartId)
     {
         var cart = _context.Carts.Find(cartId);
-        return Task.FromResult(cart);
+        if (cart is not null)
+        {
+            cart.Items = await GetCartItemsAsync(cartId);
+        }
+        return cart;
     }
 }

@@ -231,14 +231,13 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            List<CartItem> cartItems = await _cartService.GetCartItemsAsync(cartId);
-            var bill = Calculate.DefaultBill(cartItems);
+            var bill = Calculate.DefaultBill(cart.Items);
 
             CartDTO cartDTO = new()
             {
                 Id = cartId,
                 Name = cart.Name,
-                Items = cartItems.ToDTO(),
+                Items = cart.Items.ToDTO(),
                 Totals = bill.GetTotalsDTO(),
             };
 

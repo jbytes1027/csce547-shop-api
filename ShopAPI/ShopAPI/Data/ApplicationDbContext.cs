@@ -48,7 +48,8 @@ namespace ShopAPI.Data
                 .HasBaseType<Product>();
 
             modelBuilder.Entity<CartItem>()
-                .HasOne(e => e.Cart);
+                .HasOne(e => e.Cart)
+                .WithMany(e => e.Items);
 
             modelBuilder.Entity<CartItem>()
                 .HasOne(e => e.Product);
