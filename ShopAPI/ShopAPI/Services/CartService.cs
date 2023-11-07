@@ -17,6 +17,7 @@ public class CartService : ICartService
     public Task<Cart> CreateCartAsync(string name)
     {
         var newCartEntity = _context.Carts.Add(new Cart() { Name = name });
+        _context.SaveChanges();
         return Task.FromResult(newCartEntity.Entity);
     }
 
