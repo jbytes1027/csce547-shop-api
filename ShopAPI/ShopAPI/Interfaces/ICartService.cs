@@ -9,5 +9,6 @@ namespace ShopAPI.Interfaces
         public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1);
         public Task<List<CartItem>> GetCartItemsAsync(int cartId);
         public Task<Cart?> GetCart(int cartId);
+        public Task ClearCart(int cartId);
     }
 }

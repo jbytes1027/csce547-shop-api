@@ -117,4 +117,18 @@ public class CartService : ICartService
         }
         return cart;
     }
+
+
+    public Task ClearCart(int cartId)
+    {
+        var cartItems = _context.CartItems.Where(c => c.CartId == cartId);
+
+        foreach (var c in cartItems)
+        {
+            _context.CartItems.Remove(c);
+        }
+
+        _context.SaveChanges();
+        return Task.CompletedTask;
+    }
 }
