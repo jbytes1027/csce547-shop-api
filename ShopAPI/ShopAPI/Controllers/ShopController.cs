@@ -139,6 +139,12 @@ namespace ShopAPI.Controllers
                 return BadRequest("Cart does not exist");
             }
 
+            // Cart is empty, nothing to process
+            if (!cart.Any())
+            {
+                return BadRequest("Cart is empty");
+            }
+
             // Field checking
             if (dto.CardNumber.ToString().Length != 16)
             {
@@ -174,6 +180,7 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Expiration date field empty");
             }
+            
 
             /*
             // TODO(epadams) Checking date more thoroughly, maybe split
@@ -188,7 +195,9 @@ namespace ShopAPI.Controllers
             }
             */
 
-            return Ok("Payment processed for " + Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal);
+            var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+            _cartService.ClearCart(dto.CartId);
+            return Ok("Payment processed for " + bill);
         }
 
         // POST: api/AddItemToCart/{cartId}
@@ -290,6 +299,25 @@ namespace ShopAPI.Controllers
             }
 
             return await GetCart(cartId);
+        }
+
+        [HttpDelete]
+        [Route("Cart/ClearCart/{cartId}")]
+        public ActionResult ClearCart(int cartId)
+        {
+            if (_cartService.GetCart(cartId) == null)
+            {
+                return BadRequest("Cart does not exist");
+            }
+
+            var cart = _cartService.GetCart(cartId).Result;
+            if (!cart.Items.Any())
+            {
+                return BadRequest("Cart is already empty");
+            }
+
+            _cartService.ClearCart(cartId);
+            return Ok("Cart cleared");
         }
     }
 }
