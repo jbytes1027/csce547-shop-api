@@ -168,9 +168,9 @@ namespace ShopAPI.Tests
         {
             // Arrange
             CreateClient();
-            int cartID = 777;
             // Product DTO to Add Item
             ProductDTO testDTO = new ProductDTO();
+            CartDTO cartDTO = new CartDTO();
             Dictionary<string, string> testDetails = new Dictionary<string, string> { };
             testDetails.Add("Wattage", "950");
             testDTO.Category = "PowerSupply";
@@ -178,26 +178,32 @@ namespace ShopAPI.Tests
             testDTO.Name = "TEST";
             testDTO.Price = 1000;
             testDTO.Details = testDetails;
+            // Create Cart 
+            cartDTO.Name = "TEST";
+            var cartResponse = await _client.PostAsJsonAsync("api/Cart/CreateNewCart", cartDTO);
+            // Parse Response for Cart Id
+            string jCartContent = await cartResponse.Content.ReadAsStringAsync();
+            JsonDocument jCartResponse = JsonDocument.Parse(jCartContent);
+            int cartId = Convert.ToInt32(jCartResponse.RootElement.GetProperty("id").ToString());
             // Card DTO to process Payment
             CardDTO cardDTO = new CardDTO();
             cardDTO.CardHolderName = "TEST";
             cardDTO.CardNumber = 1234123412341234;
             cardDTO.Exp = "0129";
-            cardDTO.CartId = cartID;
+            cardDTO.CartId = cartId;
             cardDTO.Cvv = 777;
-
-            // Act
+            // Parse Json Response for product Id
             var postResponse = await _client.PostAsJsonAsync("api/Item", testDTO);
-            // Parse product ID for later use
             string jsonContent = await postResponse.Content.ReadAsStringAsync();
             JsonDocument jsonDocument = JsonDocument.Parse(jsonContent);
             int productId = Convert.ToInt32(jsonDocument.RootElement.GetProperty("id").ToString());
-            // AddItemt DTO to add Item to Cart
+            // AddItem To Cart
             AddItemDTO addItemDTO = new AddItemDTO();
             addItemDTO.Id = productId;
             addItemDTO.Quantity = 3;
-            // Add Item To Cart
-            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartID.ToString(), addItemDTO);
+            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartId.ToString(), addItemDTO);
+
+            // Act
             var paymentResponse = await _client.PostAsJsonAsync("api/ProcessPayment", cardDTO);
 
             // Assert
@@ -210,19 +216,25 @@ namespace ShopAPI.Tests
         {
             // Arrange
             CreateClient();
-            int cartID = 777;
-            // Product DTO to addItem
+            // Product DTO to add to a Cart
             ProductDTO testDTO = new ProductDTO();
+            CartDTO cartDTO = new CartDTO();
             Dictionary<string, string> testDetails = new Dictionary<string, string> { };
             testDetails.Add("Wattage", "950");
             testDTO.Category = "PowerSupply";
             testDTO.Manufacturer = "TEST";
             testDTO.Name = "TEST";
             testDTO.Details = testDetails;
-
-            // Act
+            // Create Cart 
+            cartDTO.Name = "TEST";
+            var cartResponse = await _client.PostAsJsonAsync("api/Cart/CreateNewCart",cartDTO);
+            // Parse Response for Cart Id
+            string jCartContent = await cartResponse.Content.ReadAsStringAsync();
+            JsonDocument jCartResponse = JsonDocument.Parse(jCartContent);
+            int cartId = Convert.ToInt32(jCartResponse.RootElement.GetProperty("id").ToString());
+            // Create Item
             var postResponse = await _client.PostAsJsonAsync("api/Item", testDTO);
-            // Parse product ID for later use
+            // Parse response for product Id
             string jsonContent = await postResponse.Content.ReadAsStringAsync();
             JsonDocument jsonDocument = JsonDocument.Parse(jsonContent);
             int productId = Convert.ToInt32(jsonDocument.RootElement.GetProperty("id").ToString());
@@ -230,20 +242,25 @@ namespace ShopAPI.Tests
             AddItemDTO addItemDTO = new AddItemDTO();
             addItemDTO.Id = productId;
             addItemDTO.Quantity = 3;
-            var response = await _client.PostAsJsonAsync("api/AddItemToCart/" + cartID.ToString(), addItemDTO);
+
+            // Act (Add Item to Cart)
+            var response = await _client.PostAsJsonAsync("api/AddItemToCart/" + cartId.ToString(), addItemDTO);
 
             // Assert
             response.EnsureSuccessStatusCode();
             await DisposeAsync();
+
+            // Delete Cart
+            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
         }
         [Fact]
         public async Task HTTPResponseGetCartTest()
         {
             // Arrange
             CreateClient();
-            int cartID = 777;
             // Product DTO to addItem
             ProductDTO testDTO = new ProductDTO();
+            CartDTO cartDTO = new CartDTO();
             Dictionary<string, string> testDetails = new Dictionary<string, string> { };
             testDetails.Add("Wattage", "950");
             testDTO.Category = "PowerSupply";
@@ -251,27 +268,37 @@ namespace ShopAPI.Tests
             testDTO.Name = "TEST";
             testDTO.Price = 1000;
             testDTO.Details = testDetails;
-
-            // Act
+            // Create Cart 
+            cartDTO.Name = "TEST";
+            var cartResponse = await _client.PostAsJsonAsync("api/Cart/CreateNewCart", cartDTO);
+            // Parse Json Response for Cart Id
+            string jCartContent = await cartResponse.Content.ReadAsStringAsync();
+            JsonDocument jCartResponse = JsonDocument.Parse(jCartContent);
+            int cartId = Convert.ToInt32(jCartResponse.RootElement.GetProperty("id").ToString());
+            // Parse Json response for product Id
             var postResponse = await _client.PostAsJsonAsync("api/Item", testDTO);
-            // Parse product ID for later use
             string jsonContent = await postResponse.Content.ReadAsStringAsync();
             JsonDocument jsonDocument = JsonDocument.Parse(jsonContent);
             int productId = Convert.ToInt32(jsonDocument.RootElement.GetProperty("id").ToString());
-            // AddItem DTO for AddToCart
+            // Add product to the Cart
             AddItemDTO addItemDTO = new AddItemDTO();
             addItemDTO.Id = productId;
             addItemDTO.Quantity = 3;
-            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartID.ToString(), addItemDTO);
-            var response = await _client.GetAsync("api/GetCart/" + cartID.ToString());
+            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartId.ToString(), addItemDTO);
+
+            // Act         
+            var response = await _client.GetAsync("api/GetCart/" + cartId.ToString());
+            // Parse GetCart Response for product Id 
             String responseBody = await response.Content.ReadAsStringAsync();
-            // Pull ID from GetCart for comparison
             JObject jsonObject = JObject.Parse(responseBody);
             int idGetCart = (int)jsonObject["items"][0]["id"];
 
             // Assert
             Assert.Equal(productId, idGetCart);
             await DisposeAsync();
+
+            // Delete Cart
+            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
         }
 
         [Fact]
@@ -280,9 +307,9 @@ namespace ShopAPI.Tests
             // Arrange
             CreateClient();
             int expectedBaseTotal = 3000;
-            int cartID = 777;
             // Product DTO to addItem
             ProductDTO testDTO = new ProductDTO();
+            CartDTO cartDTO = new CartDTO();
             Dictionary<string, string> testDetails = new Dictionary<string, string> { };
             testDetails.Add("Wattage", "950");
             testDTO.Category = "PowerSupply";
@@ -290,20 +317,27 @@ namespace ShopAPI.Tests
             testDTO.Name = "TEST";
             testDTO.Price = 1000;
             testDTO.Details = testDetails;
-
-            // Act
+            // Create Cart 
+            cartDTO.Name = "TEST";
+            var cartResponse = await _client.PostAsJsonAsync("api/Cart/CreateNewCart", cartDTO);
+            // Parse Json Response for Cart Id
+            string jCartContent = await cartResponse.Content.ReadAsStringAsync();
+            JsonDocument jCartResponse = JsonDocument.Parse(jCartContent);
+            int cartId = Convert.ToInt32(jCartResponse.RootElement.GetProperty("id").ToString());
             var postResponse = await _client.PostAsJsonAsync("api/Item", testDTO);
-            // Parse product ID for later use
+            // Parse Json Response for Product Id
             string jsonContent = await postResponse.Content.ReadAsStringAsync();
             JsonDocument jsonDocument = JsonDocument.Parse(jsonContent);
             int productId = Convert.ToInt32(jsonDocument.RootElement.GetProperty("id").ToString());
-            // AddItem DTO for AddToCart
+            // Add 3 of TEST product to cart
             AddItemDTO addItemDTO = new AddItemDTO();
             addItemDTO.Id = productId;
             addItemDTO.Quantity = 3;
-            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartID.ToString(), addItemDTO);
-            var response = await _client.GetAsync("api/GetTotals/" + cartID.ToString());
-            // Parse Cart Total for comparison
+            await _client.PostAsJsonAsync("api/AddItemToCart/" + cartId.ToString(), addItemDTO);
+
+            // Act
+            var response = await _client.GetAsync("api/GetTotals/" + cartId.ToString());
+            // Parse Json Response for Cart Total
             string jsonContentTotal = await response.Content.ReadAsStringAsync();
             JsonDocument jsonDocumentTotal = JsonDocument.Parse(jsonContentTotal);
             int baseTotal = Convert.ToInt32(jsonDocumentTotal.RootElement.GetProperty("baseTotal").ToString());
@@ -311,6 +345,9 @@ namespace ShopAPI.Tests
             // Assert
             Assert.Equal(expectedBaseTotal, baseTotal);
             await DisposeAsync();
+
+            // Delete Cart
+            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
         }
     }
 }
