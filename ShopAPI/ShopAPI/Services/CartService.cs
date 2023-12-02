@@ -28,26 +28,38 @@ namespace ShopAPI.Services
         {
             AssertCartExists(cartId);
 
-            // check if product exists
-            if (_context.Products.Find(productId) is null)
+            // Check if product exists and store it for attaching to returned cartItem
+            Product? product = _context.Products.Find(productId)
+                ?? throw new NotFoundException("Item not found");
+
+            // Don't add anything if not needed
+            if (quantity < 0)
             {
-                throw new NotFoundException("Item not found");
+                quantity = 0;
             }
 
-            // cart item to update
             CartItem? cartItem = _context.CartItems.Find(cartId, productId);
-
-            // If it doesn't exist, then create a new one with 0 quantity
-            cartItem ??= new()
+            if (cartItem is not null)
             {
-                ProductId = productId,
-                CartId = cartId,
-                Quantity = 0,
-            };
+                // Then update the existing item
+                cartItem.Quantity += quantity;
 
-            // Add quantity to existing and update
-            cartItem.Quantity += quantity;
-            _context.CartItems.Update(cartItem);
+                _context.CartItems.Update(cartItem);
+            }
+            else
+            {
+                // Then create a new item
+                cartItem = new()
+                {
+                    ProductId = productId,
+                    CartId = cartId,
+                    Quantity = quantity,
+                };
+
+                _context.CartItems.Add(cartItem);
+            }
+
+            cartItem.Product = product;
 
             await _context.SaveChangesAsync();
             return cartItem;
