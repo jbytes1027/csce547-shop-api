@@ -44,8 +44,8 @@ namespace ShopAPI.Services
         /// </summary>
         /// <param name="product">The base product to create.</param>
         /// <param name="details">Additional details to populate in the product.</param>
-        /// <returns>The created product if successful, otherwise null.</returns>
-        public async Task<Product?> CreateProductAsync(Product product, Dictionary<string, string> details)
+        /// <returns>The created product.</returns>
+        public async Task<Product> CreateProductAsync(Product product, Dictionary<string, string> details)
         {
             // Add the details to the product
             var productType = product.GetType();
