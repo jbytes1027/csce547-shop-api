@@ -34,9 +34,10 @@ namespace ShopAPI.Controllers
         [HttpGet("Item/Filter/{category}")]
         public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm)
         {
-            bool success = !Enum.TryParse(category, ignoreCase: true, out Category productCategory);
+            // Try to get category enum from category string
+            bool parseSuccess = !Enum.TryParse(category, ignoreCase: true, out Category productCategory);
 
-            if (!success)
+            if (!parseSuccess)
             {
                 return BadRequest("Invalid category");
             }
@@ -72,7 +73,10 @@ namespace ShopAPI.Controllers
                 return BadRequest("Invalid product data");
             }
 
-            if (!Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory))
+            // Try to get category enum from category string
+            bool parseSuccess = !Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory);
+
+            if (!parseSuccess)
             {
                 return BadRequest("Invalid category");
             }
