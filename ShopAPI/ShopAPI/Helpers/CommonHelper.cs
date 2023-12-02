@@ -38,7 +38,7 @@
             }
             catch (Exception)
             {
-                return null;
+                return new object();
             }
         }
     }
