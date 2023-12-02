@@ -34,7 +34,9 @@ namespace ShopAPI.Controllers
         [HttpGet("Item/Filter/{category}")]
         public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm)
         {
-            if (!Enum.TryParse(category, ignoreCase: true, out Category productCategory))
+            bool success = !Enum.TryParse(category, ignoreCase: true, out Category productCategory);
+
+            if (!success)
             {
                 return BadRequest("Invalid category");
             }
