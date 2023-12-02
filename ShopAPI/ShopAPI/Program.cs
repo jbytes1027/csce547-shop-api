@@ -1,3 +1,4 @@
+using FU.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.Interfaces;
@@ -46,6 +47,9 @@ app.UseCors(builder => builder
     .AllowAnyHeader());
 
 app.UseHttpsRedirection();
+
+// Passes exceptions through ExceptionHandler.HandleException() middleware
+app.UseExceptionHandler(new ExceptionHandlerOptions { ExceptionHandler = ExceptionHandler.HandleException });
 
 app.UseAuthorization();
 
