@@ -21,13 +21,13 @@ namespace ShopAPI.Services
 
             foreach (var c in cartItems)
             {
-                var product = _context.Products.Find(c.ProductId);
+                var product = _context.Products.Find(c.ProductId)
+                    ?? throw new NotFoundException("Product not found");
                 product.Stock -= c.Quantity;
                 _context.Products.Update(product);
             }
 
             _context.SaveChanges();
-            return;
         }
 
         public async Task<Cart> CreateCartAsync(string name)
