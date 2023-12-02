@@ -1,10 +1,9 @@
+﻿using FU.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
-using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Models;
-using System.Reflection;
 
 namespace ShopAPI.Services
 {
