@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -278,12 +278,10 @@ namespace ShopAPI.Controllers
             // If request quantity is not specified, remove all the items from the cart
             request.Quantity ??= int.MaxValue;
 
-            var item = await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
+            await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
 
-            if (item is null)
-            {
-                return NotFound();
-            }
+            return await GetCart(cartId); // Purposely deviates from http spec to matches client spec
+        }
 
             return await GetCart(cartId);
         }

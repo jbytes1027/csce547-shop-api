@@ -56,40 +56,37 @@ public class CartService : ICartService
         return cartItem;
     }
 
-    /// <returns>The removed item or null if failed</returns>
-    public Task<CartItem?> RemoveItemAsync(int cartId, int itemId, int quantity = 1)
+    /// <returns>A CartItem carrying the changes that were done</returns>
+    public async Task RemoveItemAsync(int cartId, int productId, int quantity = 1)
     {
-        CartItem? item = _context.CartItems.Find(cartId, itemId);
+        CartItem? item = _context.CartItems.Find(cartId, productId);
 
+        // check if cart exists
         if (item is null)
         {
-            // Nothing found to delete
-            return Task.FromResult(item);
+            throw new NotFoundException("Cart not found");
         }
 
-        CartItem returnedItem = new()
+        // check if product exists
+        if (_context.Products.Find(productId) is null)
         {
-            ProductId = item.ProductId,
-            CartId = item.CartId,
-        };
+            throw new NotFoundException("Item not found");
+        }
 
         if (quantity >= item.Quantity)
         {
             // Then the request is to remove all the items
             _context.CartItems.Remove(item);
-
-            // Update the amount the caller is told is removed
-            returnedItem.Quantity = item.Quantity;
         }
         else
         {
             // Then the request is to remove some of the items
             item.Quantity -= quantity;
             _context.CartItems.Update(item);
-
-            // Update the amount the caller is told is removed
-            returnedItem.Quantity = quantity;
         }
+
+        await _context.SaveChangesAsync();
+    }
 
         _context.SaveChanges();
 
