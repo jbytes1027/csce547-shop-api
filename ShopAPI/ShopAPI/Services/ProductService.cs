@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -88,11 +88,14 @@ namespace ShopAPI.Services
         {
             var product = await _context.Products.FindAsync(id);
 
-            if (product != null)
+            // Check if product exists
+            if (product is null)
             {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
+                throw new NotFoundException();
             }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
         }
     }
 }
