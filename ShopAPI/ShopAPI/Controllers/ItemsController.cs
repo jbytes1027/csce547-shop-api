@@ -120,5 +120,26 @@ namespace ShopAPI.Controllers
 
             return NoContent();
         }
+
+        /* TODO(epadams)
+        [HttpPut("Item/UpdateStock")]
+        public async Task<IActionResult> UpdateStock(int id, int quantity)
+        {
+
+            return NoContent();
+        }
+        */
+
+        [HttpPut("Item/ChangePrice")]
+        public async Task<IActionResult> ChangePrice(int id, decimal price)
+        {
+            if (price < 0)
+            {
+                return BadRequest("Price must be 0 or greater");
+            }
+
+            await _productService.UpdatePrice(id, price);
+            return Ok("Price updated to " + price);
+        }
     }
 }

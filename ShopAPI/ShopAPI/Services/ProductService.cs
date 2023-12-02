@@ -5,6 +5,7 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ShopAPI.Services
 {
@@ -103,6 +104,22 @@ namespace ShopAPI.Services
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        /// <summary>
+        ///  Updates a product's price.
+        /// </summary>
+        /// <param name="id">ID of product to update</param>
+        /// <param name="price">New price value</param>
+        public async Task UpdatePrice(int id, decimal price)
+        {
+            // Find product
+            var product = await _context.Products.FindAsync(id);
+            product.Price = price;
+
+            // Update and save
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
         }
     }
 }
