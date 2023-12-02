@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -25,31 +25,23 @@ namespace ShopAPI.Controllers
         [HttpGet("Item/GetAllItems")]
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _productService.GetProductsAsync(null, null);
-
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
+            var products = await _productService.SearchProductsAsync();
 
             return Ok(products.ModelsToDTO());
         }
 
         // GET: api/Item/Filter
         [HttpGet("Item/Filter/{category}")]
-        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm = null)
+        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm)
         {
             if (!Enum.TryParse(category, ignoreCase: true, out Category productCategory))
             {
                 return BadRequest("Invalid category");
             }
 
-            var products = await _productService.GetProductsAsync(productCategory, searchTerm);
+            searchTerm ??= "";
 
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
+            var products = await _productService.SearchProductsAsync(productCategory, searchTerm);
 
             return Ok(products.ModelsToDTO());
         }
