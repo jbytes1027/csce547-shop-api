@@ -121,25 +121,41 @@ namespace ShopAPI.Controllers
             return NoContent();
         }
 
-        /* TODO(epadams)
-        [HttpPut("Item/UpdateStock")]
-        public async Task<IActionResult> UpdateStock(int id, int quantity)
+        // PUT: api/Inventory/{id}
+        [HttpPut("Inventory/ChangePrice/{id}")]
+        public async Task<IActionResult> UpdatePrice(int id, [FromBody] PriceDTO dto)
         {
-
-            return NoContent();
-        }
-        */
-
-        [HttpPut("Item/ChangePrice")]
-        public async Task<IActionResult> ChangePrice(int id, decimal price)
-        {
-            if (price < 0)
+            // Error checking
+            if (dto.Price < 0)
             {
                 return BadRequest("Price must be 0 or greater");
             }
+            var product = await _productService.GetProductAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
 
-            await _productService.UpdatePrice(id, price);
-            return Ok("Price updated to " + price);
+            // Update price and return
+            await _productService.UpdatePrice(id, dto.Price);
+            product = await _productService.GetProductAsync(id);
+            return Ok(product.ModelToDTO());
+        }
+
+        [HttpPatch("Inventory/UpdateStock/{id}")]
+        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockDTO dto)
+        {
+            // Error checking
+            var product = await _productService.GetProductAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Update stock and return
+            await _productService.UpdateProductStock(id, dto.Stock);
+            product = await _productService.GetProductAsync(id);
+            return Ok(product.ModelToDTO());
         }
     }
 }

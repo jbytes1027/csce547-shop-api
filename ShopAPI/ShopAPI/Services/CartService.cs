@@ -14,6 +14,21 @@ public class CartService : ICartService
         _context = context;
     }
 
+    public async Task UpdateInventoryAfterPurchase(int cartId)
+    {
+        var cartItems = await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
+
+        foreach (var c in cartItems)
+        {
+            var product = _context.Products.Find(c.ProductId);
+            product.Stock -= c.Quantity;
+            _context.Products.Update(product);
+        }
+
+        _context.SaveChanges();
+        return;
+    }
+
     public Task<Cart> CreateCartAsync(string name)
     {
         var newCartEntity = _context.Carts.Add(new Cart() { Name = name });

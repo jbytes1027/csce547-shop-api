@@ -8,6 +8,7 @@
         public decimal Price { get; set; }
         public string Manufacturer { get; set; }
         public string NormalizedName { get; set; }
+        public int Stock { get; set; } = 0;
     }
 
     public class Case : Product

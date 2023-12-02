@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -120,6 +121,22 @@ namespace ShopAPI.Services
             // Update and save
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
+        }
+
+        /// Updates the stock of a product by its ID.
+        /// </summary>
+        /// <param name="id">Id of the product.</param>
+        /// <param name="quantity">Quantity to update to.</param>
+        /// <returns>Nothing.</returns>
+        public async Task UpdateProductStock(int id, int quantity)
+        {
+            var product = await _context.Products.FindAsync(id) ?? throw new ArgumentException("Invalid product ID");
+
+            product.Stock += quantity;
+
+            await _context.SaveChangesAsync();
+
+            return;
         }
     }
 }
