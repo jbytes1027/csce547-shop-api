@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -310,6 +310,12 @@ namespace ShopAPI.Controllers
             }
 
             var cart = _cartService.GetCart(cartId).Result;
+
+            if (cart is null)
+            {
+                return NotFound();
+            }
+
             if (!cart.Items.Any())
             {
                 return BadRequest("Cart is already empty");
