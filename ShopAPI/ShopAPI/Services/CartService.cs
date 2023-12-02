@@ -58,6 +58,12 @@ namespace ShopAPI.Services
         {
             AssertCartExists(cartId);
 
+            // Don't do anything if nothing needs removing
+            if (quantity < 0)
+            {
+                return;
+            }
+
             // check if product exists
             if (_context.Products.Find(productId) is null)
             {
