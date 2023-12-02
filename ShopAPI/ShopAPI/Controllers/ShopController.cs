@@ -32,19 +32,17 @@ namespace ShopAPI.Controllers
 
         // GET: api/Item/Filter
         [HttpGet("Item/Filter/{category}")]
-        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm)
+        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string keyword = "")
         {
             // Try to get category enum from category string
-            bool parseSuccess = !Enum.TryParse(category, ignoreCase: true, out Category productCategory);
+            bool parseSuccess = Enum.TryParse(category, ignoreCase: true, out Category productCategory);
 
             if (!parseSuccess)
             {
-                return BadRequest("Invalid category");
+                return NotFound("Invalid category");
             }
 
-            searchTerm ??= "";
-
-            var products = await _productService.SearchProductsAsync(productCategory, searchTerm);
+            var products = await _productService.SearchProductsAsync(productCategory, keyword);
 
             return Ok(products.ToDTO());
         }

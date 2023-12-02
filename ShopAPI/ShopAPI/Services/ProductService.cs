@@ -21,9 +21,9 @@ namespace ShopAPI.Services
         /// Retrieves products based on an optional category and an optional search term.
         /// </summary>
         /// <param name="category">The optional category to filter products.</param>
-        /// <param name="searchTerm">The optional search term to filter products by name or description.</param>
+        /// <param name="keyword">The optional search term to filter products by name or description.</param>
         /// <returns>A collection of products matching the specified criteria.</returns>
-        public async Task<IEnumerable<Product>> SearchProductsAsync(Category? category = null, string searchTerm = "")
+        public async Task<IEnumerable<Product>> SearchProductsAsync(Category? category = null, string keyword = "")
         {
             IQueryable<Product> query = _context.Products;
 
@@ -33,8 +33,8 @@ namespace ShopAPI.Services
             }
 
             // Convert searchTerm to lowercase to match case of NormalizedName
-            var searchTermLower = searchTerm.ToLower();
-            query = query.Where(p => p.NormalizedName.Contains(searchTermLower));
+            var keywordNormalized = keyword.ToLower();
+            query = query.Where(p => p.NormalizedName.Contains(keywordNormalized));
 
             return await query.ToListAsync();
         }
