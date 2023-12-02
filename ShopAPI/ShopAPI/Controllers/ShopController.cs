@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -158,11 +158,11 @@ namespace ShopAPI.Controllers
             }
 
             // Get the total with taxes
-            var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+            decimal grandTotal = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
 
             await _cartService.ClearCart(dto.CartId);
 
-            return Ok("Payment processed for " + bill);
+            return Ok("Payment processed for " + grandTotal);
         }
 
         // POST: api/AddItemToCart/{cartId}
