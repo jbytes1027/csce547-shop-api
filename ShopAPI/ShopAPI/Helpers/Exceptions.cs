@@ -34,9 +34,8 @@ public class NotFoundException : ExceptionWithResponse
     {
     }
 
-    public NotFoundException(string title, string description)
+    public NotFoundException(string description)
     {
-        Title = title;
         Description = description;
     }
 }

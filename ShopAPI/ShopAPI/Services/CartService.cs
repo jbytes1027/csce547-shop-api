@@ -1,3 +1,4 @@
+using FU.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.Interfaces;
@@ -21,42 +22,38 @@ public class CartService : ICartService
         return Task.FromResult(newCartEntity.Entity);
     }
 
-    /// <returns>The created Item or null if failed</returns>
-    public Task<CartItem?> AddItemAsync(int cartId, int itemId, int quantity = 1)
+    /// <returns>The created Item</returns>
+    public async Task<CartItem> AddItemAsync(int cartId, int productId, int quantity = 1)
     {
-        CartItem? prevItem = _context.CartItems.Find(cartId, itemId);
-
-        CartItem? item;
-        if (prevItem is not null)
+        // check if cart exists
+        if (_context.Carts.Find(cartId) is null)
         {
-            // Then update the existing item
-            item = prevItem;
-            item.Quantity += quantity;
-
-            _context.CartItems.Update(item);
-        }
-        else
-        {
-            // Then check if the cart exists
-            var cart = _context.Carts.Find(cartId);
-            if (cart is null)
-            {
-                return Task.FromResult<CartItem?>(null);
-            }
-
-            // Then create a new item
-            item = new()
-            {
-                ProductId = itemId,
-                CartId = cartId,
-                Quantity = quantity,
-            };
-
-            _context.CartItems.Add(item);
+            throw new NotFoundException("Cart not found");
         }
 
-        _context.SaveChanges();
-        return Task.FromResult<CartItem?>(item);
+        // check if product exists
+        if (_context.Products.Find(productId) is null)
+        {
+            throw new NotFoundException("Item not found");
+        }
+
+        // cart item to update
+        CartItem? cartItem = _context.CartItems.Find(cartId, productId);
+
+        // If it doesn't exist, then create a new one with 0 quantity
+        cartItem ??= new()
+        {
+            ProductId = productId,
+            CartId = cartId,
+            Quantity = 0,
+        };
+
+        // Add quantity to existing and update
+        cartItem.Quantity += quantity;
+        _context.CartItems.Update(cartItem);
+
+        await _context.SaveChangesAsync();
+        return cartItem;
     }
 
     /// <returns>The removed item or null if failed</returns>
