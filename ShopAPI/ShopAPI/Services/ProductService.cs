@@ -1,5 +1,4 @@
-﻿using FU.API.Exceptions;
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using FU.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.Helpers;
