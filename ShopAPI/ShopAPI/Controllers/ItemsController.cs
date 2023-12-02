@@ -104,5 +104,19 @@ namespace ShopAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpPatch("Inventory/UpdateStock/{id}")]
+        public async Task<IActionResult> UpdateStock(int id, [FromBody] int stock)
+        {
+            var product = await _productService.GetProductAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            await _productService.UpdateProductStock(id, stock);
+
+            return NoContent();
+        }
     }
 }

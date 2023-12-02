@@ -70,11 +70,23 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            // Get the total with taxes
-            decimal grandTotal = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+            // Make sure we have enough stock
+            foreach (var item in cart)
+            {
+                var product = item.Product;
+                if (product.Stock < item.Quantity)
+                {
+                    return BadRequest("Not enough stock for " + product.Name);
+                }
+            }
+
+            await _cartService.UpdateInventoryAfterPurchase(dto.CartId);
 
             await _cartService.ClearCart(dto.CartId);
 
+            // Get the total with taxes
+            decimal grandTotal = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+            await _cartService.ClearCart(dto.CartId);
             return Ok("Payment processed for " + grandTotal);
         }
 
