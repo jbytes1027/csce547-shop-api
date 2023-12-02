@@ -80,6 +80,16 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
+            // Make sure we have enough stock
+            foreach (var item in cart)
+            {
+                var product = item.Product;
+                if (product.Stock < item.Quantity)
+                {
+                    return BadRequest("Not enough stock for " + product.Name);
+                }
+            }
+            await _cartService.UpdateInventoryAfterPurchase(dto.CartId);
 
             /*
             // TODO(epadams) Checking date more thoroughly, maybe split
@@ -95,7 +105,7 @@ namespace ShopAPI.Controllers
             */
 
             var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
-            _cartService.ClearCart(dto.CartId);
+            await _cartService.ClearCart(dto.CartId);
             return Ok("Payment processed for " + bill);
         }
 

@@ -11,8 +11,8 @@ using ShopAPI.Data;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231107183754_CartItemRelations")]
-    partial class CartItemRelations
+    [Migration("20231202221226_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,9 @@ namespace ShopAPI.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -246,7 +249,7 @@ namespace ShopAPI.Migrations
             modelBuilder.Entity("ShopAPI.Models.CartItem", b =>
                 {
                     b.HasOne("ShopAPI.Models.Cart", "Cart")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -332,6 +335,11 @@ namespace ShopAPI.Migrations
                         .HasForeignKey("ShopAPI.Models.VideoCard", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Cart", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
