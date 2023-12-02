@@ -47,11 +47,6 @@ namespace ShopAPI.Services
         /// <returns>The created product if successful, otherwise null.</returns>
         public async Task<Product?> CreateProductAsync(Product product, Dictionary<string, string> details)
         {
-            if (product == null || details == null)
-            {
-                return null;
-            }
-
             // Add the details to the product
             var productType = product.GetType();
             var properties = productType.GetProperties();

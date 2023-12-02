@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -66,11 +66,6 @@ namespace ShopAPI.Controllers
         [Route("Item")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid product data");
-            }
-
             // Try to get category enum from category string
             bool parseSuccess = !Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory);
 
@@ -122,11 +117,6 @@ namespace ShopAPI.Controllers
         [HttpPost("ProcessPayment")]
         public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid Card details");
-            }
-
             // Checks if cart exists
             var cart = await _cartService.GetCartItemsAsync(dto.CartId);
             if (cart == null)
