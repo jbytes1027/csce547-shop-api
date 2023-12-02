@@ -5,7 +5,6 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
-using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -180,7 +179,7 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Expiration date field empty");
             }
-            
+
 
             /*
             // TODO(epadams) Checking date more thoroughly, maybe split
