@@ -205,15 +205,9 @@ namespace ShopAPI.Controllers
                 return BadRequest("Quantity must be positive");
             }
 
-            var newItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
-            if (newItem is null)
-            {
-                return NotFound("Cart not found");
-            }
+            var cartItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
 
-            var cartItemDTO = new CartItemDTO(product.ToDTO(), item.Quantity);
-
-            return Ok(cartItemDTO);
+            return Ok(cartItem.ToDTO());
         }
 
         // GET: api/GetCart/{cartId}
