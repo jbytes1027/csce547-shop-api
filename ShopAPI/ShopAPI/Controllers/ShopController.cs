@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -27,7 +27,7 @@ namespace ShopAPI.Controllers
         {
             var products = await _productService.SearchProductsAsync();
 
-            return Ok(products.ModelsToDTO());
+            return Ok(products.ToDTO());
         }
 
         // GET: api/Item/Filter
@@ -45,7 +45,7 @@ namespace ShopAPI.Controllers
 
             var products = await _productService.SearchProductsAsync(productCategory, searchTerm);
 
-            return Ok(products.ModelsToDTO());
+            return Ok(products.ToDTO());
         }
 
         // GET: api/Item/{id}
@@ -59,7 +59,7 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(product.ModelToDTO());
+            return Ok(product.ToDTO());
         }
 
         // POST: api/Item
@@ -216,7 +216,7 @@ namespace ShopAPI.Controllers
                 return NotFound("Cart not found");
             }
 
-            ProductDTO productDTO = product.ModelToDTO();
+            ProductDTO productDTO = product.ToDTO();
             CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
 
             return Ok(cartItemDTO);
