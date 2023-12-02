@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -195,7 +195,7 @@ namespace ShopAPI.Controllers
             */
 
             var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
-            _cartService.ClearCart(dto.CartId);
+            await _cartService.ClearCart(dto.CartId);
             return Ok("Payment processed for " + bill);
         }
 
