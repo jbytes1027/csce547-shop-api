@@ -89,11 +89,6 @@ namespace ShopAPI.Controllers
             // Add the product to the database
             var product = await _productService.CreateProductAsync(baseProduct, dto.Details);
 
-            if (product == null)
-            {
-                return BadRequest("Invalid product data");
-            }
-
             return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
         }
 
@@ -119,10 +114,6 @@ namespace ShopAPI.Controllers
         {
             // Checks if cart exists
             var cart = await _cartService.GetCartItemsAsync(dto.CartId);
-            if (cart == null)
-            {
-                return BadRequest("Cart does not exist");
-            }
 
             // Cart is empty, nothing to process
             if (!cart.Any())
@@ -166,20 +157,6 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-
-            /*
-            // TODO(epadams) Checking date more thoroughly, maybe split
-            try
-            {
-                var date = DateTime.Parse(dto.Exp).ToString("MM/y");
-                Console.WriteLine(date);
-            }
-            catch (FormatException)
-            {
-                return BadRequest("Unable to parse date");
-            }
-            */
-
             // Get the total with taxes
             var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
 
@@ -193,13 +170,6 @@ namespace ShopAPI.Controllers
         [Route("AddItemToCart/{cartId}")]
         public async Task<ActionResult<CartItemDTO>> AddItemToCart([FromRoute] int cartId, [FromBody] AddItemDTO item)
         {
-            Product? product = await _productService.GetProductAsync(item.Id);
-
-            if (product is null)
-            {
-                return NotFound();
-            }
-
             if (item.Quantity < 0)
             {
                 return BadRequest("Quantity must be positive");
@@ -216,6 +186,7 @@ namespace ShopAPI.Controllers
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
             Cart? cart = await _cartService.GetCart(cartId);
+
             if (cart is null)
             {
                 return NotFound();
