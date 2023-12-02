@@ -1,41 +1,42 @@
-namespace FU.API.Exceptions;
-
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
-
-public abstract class ExceptionWithResponse : Exception
+namespace FU.API.Exceptions
 {
-    public abstract string Description { get; }
+    using System.Net;
+    using Microsoft.AspNetCore.Mvc;
 
-    public abstract string Title { get; }
-
-    public abstract HttpStatusCode StatusCode { get; }
-
-    public ProblemDetails GetProblemDetails()
+    public abstract class ExceptionWithResponse : Exception
     {
-        return new ()
+        public abstract string Description { get; }
+
+        public abstract string Title { get; }
+
+        public abstract HttpStatusCode StatusCode { get; }
+
+        public ProblemDetails GetProblemDetails()
         {
-            Title = Title,
-            Detail = Description,
-            Status = (int)StatusCode,
-        };
-    }
-}
-
-public class NotFoundException : ExceptionWithResponse
-{
-    public override string Description { get; } = "The requested resourse was not found";
-
-    public override string Title { get; } = "Not found";
-
-    public override HttpStatusCode StatusCode { get; } = HttpStatusCode.NotFound;
-
-    public NotFoundException()
-    {
+            return new()
+            {
+                Title = Title,
+                Detail = Description,
+                Status = (int)StatusCode,
+            };
+        }
     }
 
-    public NotFoundException(string description)
+    public class NotFoundException : ExceptionWithResponse
     {
-        Description = description;
+        public override string Description { get; } = "The requested resourse was not found";
+
+        public override string Title { get; } = "Not found";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.NotFound;
+
+        public NotFoundException()
+        {
+        }
+
+        public NotFoundException(string description)
+        {
+            Description = description;
+        }
     }
 }
