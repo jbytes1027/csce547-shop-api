@@ -11,12 +11,10 @@ namespace ShopAPI.Controllers
     [ApiController]
     public class ItemsController : ControllerBase
     {
-        private readonly ICartService _cartService;
         private readonly IProductService _productService;
 
-        public ItemsController(ICartService cartService, IProductService productService)
+        public ItemsController(IProductService productService)
         {
-            _cartService = cartService;
             _productService = productService;
         }
 

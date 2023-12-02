@@ -146,4 +146,21 @@ namespace ShopAPI.Services
             }
         }
     }
+
+    public Task RemoveCart(int cartId)
+    {
+        // Clear Cart First
+        ClearCart(cartId);
+
+        // Remove Cart with Desired Id
+        var carts = _context.Carts.Where(c => c.Id == cartId);
+        foreach (var c in carts)
+        {
+            _context.Carts.Remove(c);
+        }
+
+        // Save to DB
+        _context.SaveChanges();
+        return Task.CompletedTask;
+    }
 }

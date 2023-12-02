@@ -10,12 +10,12 @@ namespace ShopAPI.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class ShopController : ControllerBase
+    public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
 
-        public ShopController(ICartService cartService, IProductService productService)
+        public CartController(ICartService cartService, IProductService productService)
         {
             _cartService = cartService;
             _productService = productService;
@@ -99,7 +99,6 @@ namespace ShopAPI.Controllers
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
             Cart? cart = await _cartService.GetCart(cartId);
-
             if (cart is null)
             {
                 return NotFound();
@@ -174,6 +173,22 @@ namespace ShopAPI.Controllers
             await _cartService.ClearCart(cartId);
 
             return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("Cart/RemoveCart/{cartId}")]
+        public async Task<ActionResult<CartDTO>> DeleteCart(int cartId)
+        {
+            var cartSearch = await _cartService.GetCart(cartId);
+            if (cartSearch == null)
+            {
+                return BadRequest("Cart does not exist");
+            }
+            else
+            {
+                await _cartService.RemoveCart(cartId);
+                return Ok("Cart removed");
+            }
         }
     }
 }
