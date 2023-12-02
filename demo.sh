@@ -60,7 +60,7 @@ echo '{
 http -v GET ":5148/api/Item/GetAllItems"
 
 # Filter for a specific item
-http -v GET ":5148/api/Item/Filter/cpu?searchTerm=intel"
+http -v GET ":5148/api/Item/Filter/cpu?keyword=intel"
 
 # Get a specific items details
 http -v GET ":5148/api/Item/3"
