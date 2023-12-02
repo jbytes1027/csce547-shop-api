@@ -15,21 +15,18 @@ public class CartService : ICartService
         _context = context;
     }
 
-    public Task<Cart> CreateCartAsync(string name)
+    public async Task<Cart> CreateCartAsync(string name)
     {
+        // Create a new cart with the given name, tracking the db changes
         var newCartEntity = _context.Carts.Add(new Cart() { Name = name });
-        _context.SaveChanges();
-        return Task.FromResult(newCartEntity.Entity);
+        await _context.SaveChangesAsync();
+        return newCartEntity.Entity;
     }
 
     /// <returns>The created Item</returns>
     public async Task<CartItem> AddItemAsync(int cartId, int productId, int quantity = 1)
     {
-        // check if cart exists
-        if (_context.Carts.Find(cartId) is null)
-        {
-            throw new NotFoundException("Cart not found");
-        }
+        AssertCartExists(cartId);
 
         // check if product exists
         if (_context.Products.Find(productId) is null)
@@ -59,13 +56,7 @@ public class CartService : ICartService
     /// <returns>A CartItem carrying the changes that were done</returns>
     public async Task RemoveItemAsync(int cartId, int productId, int quantity = 1)
     {
-        CartItem? item = _context.CartItems.Find(cartId, productId);
-
-        // check if cart exists
-        if (item is null)
-        {
-            throw new NotFoundException("Cart not found");
-        }
+        AssertCartExists(cartId);
 
         // check if product exists
         if (_context.Products.Find(productId) is null)
@@ -73,48 +64,52 @@ public class CartService : ICartService
             throw new NotFoundException("Item not found");
         }
 
-        if (quantity >= item.Quantity)
+        CartItem? cartItem = _context.CartItems.Find(cartId, productId)
+            ?? throw new NotFoundException();
+
+        if (quantity >= cartItem.Quantity)
         {
             // Then the request is to remove all the items
-            _context.CartItems.Remove(item);
+            _context.CartItems.Remove(cartItem);
         }
         else
         {
             // Then the request is to remove some of the items
-            item.Quantity -= quantity;
-            _context.CartItems.Update(item);
+            cartItem.Quantity -= quantity;
+            _context.CartItems.Update(cartItem);
         }
 
         await _context.SaveChangesAsync();
     }
 
-        _context.SaveChanges();
-
-        return Task.FromResult<CartItem?>(returnedItem);
-    }
-
-    public Task<List<CartItem>> GetCartItemsAsync(int cartId)
+    public async Task<List<CartItem>> GetCartItemsAsync(int cartId)
     {
-        var cartItems = _context.CartItems
+        AssertCartExists(cartId);
+
+        return await _context.CartItems
             .Where(item => item.CartId == cartId)
             .Include(item => item.Product)
-            .ToList();
-        return Task.FromResult(cartItems);
+            .ToListAsync();
     }
 
+    /// <returns>The cart or null if not found</returns>
     public async Task<Cart?> GetCart(int cartId)
     {
         var cart = _context.Carts.Find(cartId);
+
         if (cart is not null)
         {
+            // Populate the cart's items
             cart.Items = await GetCartItemsAsync(cartId);
         }
+
         return cart;
     }
 
-
-    public Task ClearCart(int cartId)
+    public async Task ClearCart(int cartId)
     {
+        AssertCartExists(cartId);
+
         var cartItems = _context.CartItems.Where(c => c.CartId == cartId);
 
         foreach (var c in cartItems)
@@ -122,7 +117,14 @@ public class CartService : ICartService
             _context.CartItems.Remove(c);
         }
 
-        _context.SaveChanges();
-        return Task.CompletedTask;
+        await _context.SaveChangesAsync();
+    }
+
+    private void AssertCartExists(int cartId)
+    {
+        if (_context.Carts.Find(cartId) is null)
+        {
+            throw new NotFoundException();
+        }
     }
 }
