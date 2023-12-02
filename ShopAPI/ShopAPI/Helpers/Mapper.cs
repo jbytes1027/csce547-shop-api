@@ -107,5 +107,10 @@ namespace ShopAPI.Mappers
 
             return cartItemDTOs;
         }
+
+        public static CartItemDTO ToDTO(this CartItem cartItem)
+        {
+            return new CartItemDTO(cartItem.Product.ToDTO(), cartItem.Quantity);
+        }
     }
 }
