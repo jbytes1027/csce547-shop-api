@@ -283,18 +283,10 @@ namespace ShopAPI.Controllers
             return await GetCart(cartId); // Purposely deviates from http spec to matches client spec
         }
 
-            return await GetCart(cartId);
-        }
-
-        [HttpDelete]
+        [HttpPost]
         [Route("Cart/ClearCart/{cartId}")]
-        public ActionResult ClearCart(int cartId)
+        public async Task<ActionResult> ClearCart(int cartId)
         {
-            if (_cartService.GetCart(cartId) == null)
-            {
-                return BadRequest("Cart does not exist");
-            }
-
             var cart = _cartService.GetCart(cartId).Result;
 
             if (cart is null)
@@ -302,13 +294,9 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            if (!cart.Items.Any())
-            {
-                return BadRequest("Cart is already empty");
-            }
+            await _cartService.ClearCart(cartId);
 
-            _cartService.ClearCart(cartId);
-            return Ok("Cart cleared");
+            return NoContent();
         }
     }
 }
