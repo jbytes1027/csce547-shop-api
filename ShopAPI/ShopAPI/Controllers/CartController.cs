@@ -11,116 +11,15 @@ namespace ShopAPI.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class ShopController : ControllerBase
+    public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
         private readonly IProductService _productService;
 
-        public ShopController(ICartService cartService, IProductService productService)
+        public CartController(ICartService cartService, IProductService productService)
         {
             _cartService = cartService;
             _productService = productService;
-        }
-
-        // GET: api/Item/GetAllItems
-        [HttpGet("Item/GetAllItems")]
-        public async Task<IActionResult> GetAllProducts()
-        {
-            var products = await _productService.GetProductsAsync(null, null);
-
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(products.ModelsToDTO());
-        }
-
-        // GET: api/Item/Filter
-        [HttpGet("Item/Filter/{category}")]
-        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm = null)
-        {
-            if (!Enum.TryParse(category, ignoreCase: true, out Category productCategory))
-            {
-                return BadRequest("Invalid category");
-            }
-
-            var products = await _productService.GetProductsAsync(productCategory, searchTerm);
-
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(products.ModelsToDTO());
-        }
-
-        // GET: api/Item/{id}
-        [HttpGet("Item/{id}")]
-        public async Task<IActionResult> GetProductById(int id)
-        {
-            var product = await _productService.GetProductAsync(id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(product.ModelToDTO());
-        }
-
-        // POST: api/Item
-        [HttpPost]
-        [Route("Item")]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
-        {
-            if (dto == null)
-            {
-                return BadRequest("Invalid product data");
-            }
-
-            if (!Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory))
-            {
-                return BadRequest("Invalid category");
-            }
-
-            // Create a new base product entity
-            var baseProduct = dto.ToBaseProduct(productCategory);
-
-            // Make sure the product details are valid
-            var validationError = ProductHelper.ValidateProductDetails(productCategory, dto.Details);
-
-            // If the product details are invalid, return a bad request
-            if (validationError != null)
-            {
-                return BadRequest(validationError);
-            }
-
-            // Add the product to the database
-            var product = await _productService.CreateProductAsync(baseProduct, dto.Details);
-
-            if (product == null)
-            {
-                return BadRequest("Invalid product data");
-            }
-
-            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
-        }
-
-        // DELETE: api/products/{id}
-        [HttpDelete("Item/{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            // Find the product
-            var product = await _productService.GetProductAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            await _productService.RemoveProductAsync(id);
-
-            return NoContent();
         }
 
         // POST: api/processpayment
@@ -180,7 +79,7 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Expiration date field empty");
             }
-            
+
 
             /*
             // TODO(epadams) Checking date more thoroughly, maybe split
@@ -318,6 +217,22 @@ namespace ShopAPI.Controllers
 
             _cartService.ClearCart(cartId);
             return Ok("Cart cleared");
+        }
+
+        [HttpDelete]
+        [Route("Cart/RemoveCart/{cartId}")]
+        public async Task<ActionResult<CartDTO>> DeleteCart(int cartId)
+        {
+            var cartSearch = await _cartService.GetCart(cartId);
+            if (cartSearch == null)
+            {
+                return BadRequest("Cart does not exist");
+            }
+            else
+            {
+                await _cartService.RemoveCart(cartId);
+                return Ok("Cart removed");
+            }
         }
     }
 }
