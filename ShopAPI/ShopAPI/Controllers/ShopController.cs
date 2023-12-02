@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
@@ -67,7 +67,7 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
             // Try to get category enum from category string
-            bool parseSuccess = !Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory);
+            bool parseSuccess = Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory);
 
             if (!parseSuccess)
             {
@@ -180,8 +180,11 @@ namespace ShopAPI.Controllers
             }
             */
 
+            // Get the total with taxes
             var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+
             await _cartService.ClearCart(dto.CartId);
+
             return Ok("Payment processed for " + bill);
         }
 
@@ -208,8 +211,7 @@ namespace ShopAPI.Controllers
                 return NotFound("Cart not found");
             }
 
-            ProductDTO productDTO = product.ToDTO();
-            CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
+            var cartItemDTO = new CartItemDTO(product.ToDTO(), item.Quantity);
 
             return Ok(cartItemDTO);
         }
