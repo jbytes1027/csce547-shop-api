@@ -17,7 +17,7 @@ namespace ShopAPI.Services
 
         /// <exception cref="NotFoundException">Thrown when an product in the cart doesn't exist</exception>
         /// <exception cref="BadRequestException">Thrown when there isn't enough stock in the inventory to remove</exception>
-        public async Task RemoveCartItemsFromInventory(int cartId)
+        public async Task RemoveCartItemsFromInventoryAsync(int cartId)
         {
             AssertCartExists(cartId);
 
@@ -139,7 +139,7 @@ namespace ShopAPI.Services
         }
 
         /// <returns>The cart or null if not found</returns>
-        public async Task<Cart?> GetCart(int cartId)
+        public async Task<Cart?> GetCartAsync(int cartId)
         {
             var cart = _context.Carts.Find(cartId);
 
@@ -153,7 +153,7 @@ namespace ShopAPI.Services
         }
 
         // Removes all the items from a cart
-        public async Task ClearCart(int cartId)
+        public async Task ClearCartAsync(int cartId)
         {
             AssertCartExists(cartId);
 
@@ -175,10 +175,10 @@ namespace ShopAPI.Services
             }
         }
 
-        public async Task RemoveCart(int cartId)
+        public async Task RemoveCartAsync(int cartId)
         {
             // Clear Cart First
-            await ClearCart(cartId);
+            await ClearCartAsync(cartId);
 
             // Remove Cart with Desired Id
             var carts = _context.Carts.Where(c => c.Id == cartId);
