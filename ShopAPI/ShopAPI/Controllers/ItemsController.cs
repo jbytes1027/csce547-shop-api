@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol;
 using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
-using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -14,7 +12,7 @@ namespace ShopAPI.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IProductService _productService;
-        
+
         public ItemsController(IProductService productService)
         {
             _productService = productService;
@@ -24,33 +22,26 @@ namespace ShopAPI.Controllers
         [HttpGet("Item/GetAllItems")]
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _productService.GetProductsAsync(null, null);
+            var products = await _productService.SearchProductsAsync();
 
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(products.ModelsToDTO());
+            return Ok(products.ToDTO());
         }
 
         // GET: api/Item/Filter
         [HttpGet("Item/Filter/{category}")]
-        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string? searchTerm = null)
+        public async Task<IActionResult> FilterProducts(string category, [FromQuery] string keyword = "")
         {
-            if (!Enum.TryParse(category, ignoreCase: true, out Category productCategory))
+            // Try to get category enum from category string
+            bool parseSuccess = Enum.TryParse(category, ignoreCase: true, out Category productCategory);
+
+            if (!parseSuccess)
             {
-                return BadRequest("Invalid category");
+                return NotFound("Invalid category");
             }
 
-            var products = await _productService.GetProductsAsync(productCategory, searchTerm);
+            var products = await _productService.SearchProductsAsync(productCategory, keyword);
 
-            if (products == null || !products.Any())
-            {
-                return NotFound();
-            }
-
-            return Ok(products.ModelsToDTO());
+            return Ok(products.ToDTO());
         }
 
         // GET: api/Item/{id}
@@ -64,7 +55,7 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(product.ModelToDTO());
+            return Ok(product.ToDTO());
         }
 
         // POST: api/Item
@@ -72,12 +63,10 @@ namespace ShopAPI.Controllers
         [Route("Item")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid product data");
-            }
+            // Try to get category enum from category string
+            bool parseSuccess = Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory);
 
-            if (!Enum.TryParse(dto.Category, ignoreCase: true, out Category productCategory))
+            if (!parseSuccess)
             {
                 return BadRequest("Invalid category");
             }
@@ -96,11 +85,6 @@ namespace ShopAPI.Controllers
 
             // Add the product to the database
             var product = await _productService.CreateProductAsync(baseProduct, dto.Details);
-
-            if (product == null)
-            {
-                return BadRequest("Invalid product data");
-            }
 
             return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
         }
@@ -139,7 +123,7 @@ namespace ShopAPI.Controllers
             // Update price and return
             await _productService.UpdatePrice(id, dto.Price);
             product = await _productService.GetProductAsync(id);
-            return Ok(product.ModelToDTO());
+            return Ok(product.ToDTO());
         }
 
         [HttpPatch("Inventory/UpdateStock/{id}")]
@@ -155,7 +139,7 @@ namespace ShopAPI.Controllers
             // Update stock and return
             await _productService.UpdateProductStock(id, dto.Stock);
             product = await _productService.GetProductAsync(id);
-            return Ok(product.ModelToDTO());
+            return Ok(product.ToDTO());
         }
     }
 }

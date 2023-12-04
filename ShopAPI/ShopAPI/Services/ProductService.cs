@@ -1,12 +1,9 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using FU.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
-using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Models;
-using System.Reflection;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ShopAPI.Services
 {
@@ -23,9 +20,9 @@ namespace ShopAPI.Services
         /// Retrieves products based on an optional category and an optional search term.
         /// </summary>
         /// <param name="category">The optional category to filter products.</param>
-        /// <param name="searchTerm">The optional search term to filter products by name or description.</param>
+        /// <param name="keyword">The optional search term to filter products by name or description.</param>
         /// <returns>A collection of products matching the specified criteria.</returns>
-        public async Task<IEnumerable<Product>?> GetProductsAsync(Category? category, string? searchTerm)
+        public async Task<IEnumerable<Product>> SearchProductsAsync(Category? category = null, string keyword = "")
         {
             IQueryable<Product> query = _context.Products;
 
@@ -34,14 +31,9 @@ namespace ShopAPI.Services
                 query = query.Where(p => p.Category == category);
             }
 
-            if (searchTerm != null)
-            {
-                // Convert searchTerm to lowercase
-                var searchTermLower = searchTerm.ToLower();
-
-                query = query.Where(p => p.NormalizedName.Contains(searchTermLower));
-            }
-
+            // Convert searchTerm to lowercase to match case of NormalizedName
+            var keywordNormalized = keyword.ToLower();
+            query = query.Where(p => p.NormalizedName.Contains(keywordNormalized));
 
             return await query.ToListAsync();
         }
@@ -51,14 +43,9 @@ namespace ShopAPI.Services
         /// </summary>
         /// <param name="product">The base product to create.</param>
         /// <param name="details">Additional details to populate in the product.</param>
-        /// <returns>The created product if successful, otherwise null.</returns>
-        public async Task<Product?> CreateProductAsync(Product product, Dictionary<string, string> details)
+        /// <returns>The created product.</returns>
+        public async Task<Product> CreateProductAsync(Product product, Dictionary<string, string> details)
         {
-            if (product == null || details == null)
-            {
-                return null;
-            }
-
             // Add the details to the product
             var productType = product.GetType();
             var properties = productType.GetProperties();
@@ -100,11 +87,14 @@ namespace ShopAPI.Services
         {
             var product = await _context.Products.FindAsync(id);
 
-            if (product != null)
+            // Check if product exists
+            if (product is null)
             {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
+                throw new NotFoundException();
             }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>

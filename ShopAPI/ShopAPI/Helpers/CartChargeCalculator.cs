@@ -114,11 +114,13 @@ namespace ShopAPI.Helpers
         }
     }
 
+    // Interface for adding charges to a bill
     public interface ISurchargeCalculator
     {
         public void AddCalculatedTo(Bill bill);
     }
 
+    // Stores a fee (positive) or discount (negative)
     public record Surcharge
     {
         public decimal Cost { get; set; }

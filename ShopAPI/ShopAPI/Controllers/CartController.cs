@@ -5,7 +5,6 @@ using ShopAPI.Helpers;
 using ShopAPI.Interfaces;
 using ShopAPI.Mappers;
 using ShopAPI.Models;
-using ShopAPI.Services;
 
 namespace ShopAPI.Controllers
 {
@@ -26,17 +25,8 @@ namespace ShopAPI.Controllers
         [HttpPost("ProcessPayment")]
         public async Task<IActionResult> ProcessPayment([FromBody] CardDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid Card details");
-            }
-
             // Checks if cart exists
             var cart = await _cartService.GetCartItemsAsync(dto.CartId);
-            if (cart == null)
-            {
-                return BadRequest("Cart does not exist");
-            }
 
             // Cart is empty, nothing to process
             if (!cart.Any())
@@ -89,24 +79,15 @@ namespace ShopAPI.Controllers
                     return BadRequest("Not enough stock for " + product.Name);
                 }
             }
+
             await _cartService.UpdateInventoryAfterPurchase(dto.CartId);
 
-            /*
-            // TODO(epadams) Checking date more thoroughly, maybe split
-            try
-            {
-                var date = DateTime.Parse(dto.Exp).ToString("MM/y");
-                Console.WriteLine(date);
-            }
-            catch (FormatException)
-            {
-                return BadRequest("Unable to parse date");
-            }
-            */
-
-            var bill = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
             await _cartService.ClearCart(dto.CartId);
-            return Ok("Payment processed for " + bill);
+
+            // Get the total with taxes
+            decimal grandTotal = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
+            await _cartService.ClearCart(dto.CartId);
+            return Ok("Payment processed for " + grandTotal);
         }
 
         // POST: api/AddItemToCart/{cartId}
@@ -114,28 +95,14 @@ namespace ShopAPI.Controllers
         [Route("AddItemToCart/{cartId}")]
         public async Task<ActionResult<CartItemDTO>> AddItemToCart([FromRoute] int cartId, [FromBody] AddItemDTO item)
         {
-            Product? product = await _productService.GetProductAsync(item.Id);
-
-            if (product is null)
-            {
-                return NotFound();
-            }
-
             if (item.Quantity < 0)
             {
                 return BadRequest("Quantity must be positive");
             }
 
-            var newItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
-            if (newItem is null)
-            {
-                return NotFound("Cart not found");
-            }
+            var cartItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
 
-            ProductDTO productDTO = product.ModelToDTO();
-            CartItemDTO cartItemDTO = new(productDTO, item.Quantity);
-
-            return Ok(cartItemDTO);
+            return Ok(cartItem.ToDTO());
         }
 
         // GET: api/GetCart/{cartId}
@@ -181,7 +148,6 @@ namespace ShopAPI.Controllers
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
             var bill = Calculate.DefaultBill(items);
-            Console.WriteLine(bill);
             return Ok(bill.ToJson());
         }
 
@@ -200,33 +166,25 @@ namespace ShopAPI.Controllers
             // If request quantity is not specified, remove all the items from the cart
             request.Quantity ??= int.MaxValue;
 
-            var item = await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
+            await _cartService.RemoveItemAsync(cartId, request.ItemId, (int)request.Quantity);
 
-            if (item is null)
+            return await GetCart(cartId); // Purposely deviates from http spec to matches client spec
+        }
+
+        [HttpPost]
+        [Route("Cart/ClearCart/{cartId}")]
+        public async Task<ActionResult> ClearCart(int cartId)
+        {
+            var cart = _cartService.GetCart(cartId).Result;
+
+            if (cart is null)
             {
                 return NotFound();
             }
 
-            return await GetCart(cartId);
-        }
+            await _cartService.ClearCart(cartId);
 
-        [HttpDelete]
-        [Route("Cart/ClearCart/{cartId}")]
-        public ActionResult ClearCart(int cartId)
-        {
-            if (_cartService.GetCart(cartId) == null)
-            {
-                return BadRequest("Cart does not exist");
-            }
-
-            var cart = _cartService.GetCart(cartId).Result;
-            if (!cart.Items.Any())
-            {
-                return BadRequest("Cart is already empty");
-            }
-
-            _cartService.ClearCart(cartId);
-            return Ok("Cart cleared");
+            return NoContent();
         }
 
         [HttpDelete]

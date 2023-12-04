@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ShopAPI.Models;
 
 namespace ShopAPI.Data
@@ -46,10 +46,6 @@ namespace ShopAPI.Data
             modelBuilder.Entity<PowerSupply>()
                 .ToTable("PowerSupplies")
                 .HasBaseType<Product>();
-
-            modelBuilder.Entity<CartItem>()
-                .HasOne(e => e.Cart)
-                .WithMany(e => e.Items);
 
             modelBuilder.Entity<CartItem>()
                 .HasOne(e => e.Product);
