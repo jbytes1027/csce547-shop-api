@@ -182,15 +182,14 @@ namespace ShopAPI.Controllers
         public async Task<ActionResult<CartDTO>> DeleteCart(int cartId)
         {
             var cartSearch = await _cartService.GetCart(cartId);
+
             if (cartSearch == null)
             {
                 return BadRequest("Cart does not exist");
             }
-            else
-            {
-                await _cartService.RemoveCart(cartId);
-                return Ok("Cart removed");
-            }
+
+            await _cartService.RemoveCart(cartId);
+            return NoContent();
         }
     }
 }
