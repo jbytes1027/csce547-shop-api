@@ -15,7 +15,7 @@ namespace ShopAPI.Services
             _context = context;
         }
 
-        public async Task UpdateInventoryAfterPurchase(int cartId)
+        public async Task RemoveCartItemsFromStock(int cartId)
         {
             var cartItems = await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
 
@@ -74,6 +74,7 @@ namespace ShopAPI.Services
                 _context.CartItems.Add(cartItem);
             }
 
+            // Add the product to the returned cartItem
             cartItem.Product = product;
 
             await _context.SaveChangesAsync();
