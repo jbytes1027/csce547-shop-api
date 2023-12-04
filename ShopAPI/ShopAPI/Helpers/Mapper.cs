@@ -113,5 +113,24 @@ namespace ShopAPI.Mappers
         {
             return new CartItemDTO(cartItem.Product.ToDTO(), cartItem.Quantity);
         }
+
+        /// <summary>
+        /// Ensures bill has 2 digit rounding
+        /// </summary>
+        /// <returns>Returns a bill with charges rounded to 2 decimal places</returns>
+        public static Bill ToDTO(this Bill bill)
+        {
+            foreach (var surcharge in bill.TaxSurcharges)
+            {
+                surcharge.Cost = Math.Round(surcharge.Cost, 2);
+            }
+
+            foreach (var surcharge in bill.BundleSurcharges)
+            {
+                surcharge.Cost = Math.Round(surcharge.Cost, 2);
+            }
+
+            return bill;
+        }
     }
 }

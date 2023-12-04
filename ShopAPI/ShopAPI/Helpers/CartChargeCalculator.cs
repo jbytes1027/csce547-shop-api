@@ -21,9 +21,9 @@ namespace ShopAPI.Helpers
 
     public class Bill
     {
-        public List<CartItem> Items;
-        public List<Surcharge> BundleSurcharges;
-        public List<Surcharge> TaxSurcharges;
+        public List<CartItem> Items { get; set; }
+        public List<Surcharge> BundleSurcharges { get; set; }
+        public List<Surcharge> TaxSurcharges { get; set; }
 
         public Bill()
         {
