@@ -48,7 +48,7 @@ app.UseCors(builder => builder
 
 app.UseHttpsRedirection();
 
-// Passes exceptions through ExceptionHandler.HandleException() middleware
+// Makes exceptions pass through ExceptionHandler.HandleException() middleware
 app.UseExceptionHandler(new ExceptionHandlerOptions { ExceptionHandler = ExceptionHandler.HandleException });
 
 app.UseAuthorization();

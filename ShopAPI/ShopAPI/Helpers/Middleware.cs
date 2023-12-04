@@ -5,6 +5,7 @@ namespace FU.API.Middleware
 
     public static class ExceptionHandler
     {
+        // Handles exception by modifying the context, or lets the exceptions pass through
         public static async Task HandleException(HttpContext context)
         {
             // Get the error from the context
