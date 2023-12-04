@@ -157,7 +157,7 @@ namespace ShopAPI.Services
         {
             if (_context.Carts.Find(cartId) is null)
             {
-                throw new NotFoundException();
+                throw new NotFoundException("Cart not found");
             }
         }
 
