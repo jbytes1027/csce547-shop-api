@@ -106,7 +106,7 @@ namespace ShopAPI.Controllers
         }
 
         // PUT: api/Inventory/{id}
-        [HttpPut("Inventory/ChangePrice/{id}")]
+        [HttpPut("Inventory/{id}/ChangePrice")]
         public async Task<IActionResult> UpdatePrice(int id, [FromBody] PriceDTO dto)
         {
             // Error checking
@@ -114,31 +114,17 @@ namespace ShopAPI.Controllers
             {
                 return BadRequest("Price must be 0 or greater");
             }
-            var product = await _productService.GetProductAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
 
             // Update price and return
-            await _productService.UpdatePrice(id, dto.Price);
-            product = await _productService.GetProductAsync(id);
+            var product = await _productService.UpdateProductPrice(id, dto.Price);
             return Ok(product.ToDTO());
         }
 
-        [HttpPatch("Inventory/UpdateStock/{id}")]
-        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockDTO dto)
+        [HttpPatch("Inventory/{id}/AddStock")]
+        public async Task<IActionResult> AddStock(int id, [FromBody] StockDTO dto)
         {
-            // Error checking
-            var product = await _productService.GetProductAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
             // Update stock and return
-            await _productService.UpdateProductStock(id, dto.Stock);
-            product = await _productService.GetProductAsync(id);
+            var product = await _productService.AddProductStock(id, dto.Stock);
             return Ok(product.ToDTO());
         }
     }
