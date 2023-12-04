@@ -39,4 +39,22 @@ namespace FU.API.Exceptions
             Description = description;
         }
     }
+
+    public class BadRequestException : ExceptionWithResponse
+    {
+        public override string Description { get; } = "Bad Request";
+
+        public override string Title { get; } = "Bad Request";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.BadRequest;
+
+        public BadRequestException()
+        {
+        }
+
+        public BadRequestException(string description)
+        {
+            Description = description;
+        }
+    }
 }

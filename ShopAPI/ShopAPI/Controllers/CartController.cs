@@ -70,16 +70,6 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            // Make sure we have enough stock
-            foreach (var item in cart)
-            {
-                var product = item.Product;
-                if (product.Stock < item.Quantity)
-                {
-                    return BadRequest("Not enough stock for " + product.Name);
-                }
-            }
-
             await _cartService.RemoveCartItemsFromInventory(dto.CartId);
 
             await _cartService.ClearCart(dto.CartId);

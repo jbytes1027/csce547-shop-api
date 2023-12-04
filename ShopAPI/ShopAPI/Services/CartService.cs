@@ -15,15 +15,24 @@ namespace ShopAPI.Services
             _context = context;
         }
 
+        /// <exception cref="NotFoundException">Thrown when an product in the cart doesn't exist</exception>
+        /// <exception cref="BadRequestException">Thrown when there isn't enough stock in the inventory to remove</exception>
         public async Task RemoveCartItemsFromInventory(int cartId)
         {
             var cartItems = await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
 
-            foreach (var c in cartItems)
+            foreach (var cartItem in cartItems)
             {
-                var product = _context.Products.Find(c.ProductId)
+                var product = _context.Products.Find(cartItem.ProductId)
                     ?? throw new NotFoundException("Product not found");
-                product.Stock -= c.Quantity;
+
+                // Make there is enough in stock
+                if (product.Stock < cartItem.Quantity)
+                {
+                    throw new BadRequestException("Not enough stock for " + cartItem.Product.Name);
+                }
+
+                product.Stock -= cartItem.Quantity;
                 _context.Products.Update(product);
             }
 
