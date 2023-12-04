@@ -11,6 +11,6 @@ namespace ShopAPI.Interfaces
         public Task<Cart?> GetCart(int cartId);
         public Task ClearCart(int cartId);
         public Task RemoveCart(int cartId);
-        public Task RemoveCartItemsFromStock(int cartId);
+        public Task RemoveCartItemsFromInventory(int cartId);
     }
 }

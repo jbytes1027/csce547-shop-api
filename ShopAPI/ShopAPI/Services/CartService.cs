@@ -15,7 +15,7 @@ namespace ShopAPI.Services
             _context = context;
         }
 
-        public async Task RemoveCartItemsFromStock(int cartId)
+        public async Task RemoveCartItemsFromInventory(int cartId)
         {
             var cartItems = await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
 

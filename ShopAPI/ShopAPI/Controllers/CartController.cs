@@ -80,7 +80,7 @@ namespace ShopAPI.Controllers
                 }
             }
 
-            await _cartService.RemoveCartItemsFromStock(dto.CartId);
+            await _cartService.RemoveCartItemsFromInventory(dto.CartId);
 
             await _cartService.ClearCart(dto.CartId);
 
