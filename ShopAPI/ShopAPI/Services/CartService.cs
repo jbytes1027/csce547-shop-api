@@ -19,6 +19,8 @@ namespace ShopAPI.Services
         /// <exception cref="BadRequestException">Thrown when there isn't enough stock in the inventory to remove</exception>
         public async Task RemoveCartItemsFromInventory(int cartId)
         {
+            AssertCartExists(cartId);
+
             var cartItems = await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
 
             foreach (var cartItem in cartItems)
