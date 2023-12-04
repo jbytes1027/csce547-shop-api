@@ -24,7 +24,7 @@ namespace FU.API.Exceptions
 
     public class NotFoundException : ExceptionWithResponse
     {
-        public override string Description { get; } = "The requested resourse was not found";
+        public override string Description { get; } = "The requested resource was not found.";
 
         public override string Title { get; } = "Not found";
 
