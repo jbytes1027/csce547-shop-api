@@ -41,6 +41,7 @@ namespace ShopAPI.Services
             _context.SaveChanges();
         }
 
+        /// <returns>The created cart</returns>
         public async Task<Cart> CreateCartAsync(string name)
         {
             // Create a new cart with the given name, tracking the db changes
@@ -151,6 +152,7 @@ namespace ShopAPI.Services
             return cart;
         }
 
+        // Removes all the items from a cart
         public async Task ClearCart(int cartId)
         {
             AssertCartExists(cartId);
