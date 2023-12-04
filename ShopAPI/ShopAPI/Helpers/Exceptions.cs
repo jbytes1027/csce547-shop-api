@@ -39,4 +39,22 @@ namespace FU.API.Exceptions
             Description = description;
         }
     }
+
+    public class ConflictException : ExceptionWithResponse
+    {
+        public override string Description { get; } = "A conflict occured with the requested resource.";
+
+        public override string Title { get; } = "Conflict";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.Conflict;
+
+        public ConflictException()
+        {
+        }
+
+        public ConflictException(string description)
+        {
+            Description = description;
+        }
+    }
 }

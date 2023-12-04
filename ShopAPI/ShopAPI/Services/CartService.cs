@@ -47,6 +47,7 @@ namespace ShopAPI.Services
             Product? product = _context.Products.Find(productId)
                 ?? throw new NotFoundException("Item not found");
 
+
             // Don't add anything if not needed
             if (quantity < 0)
             {
@@ -72,6 +73,11 @@ namespace ShopAPI.Services
                 };
 
                 _context.CartItems.Add(cartItem);
+            }
+
+            if (product.Stock < cartItem.Quantity)
+            {
+                throw new ConflictException("Quantity in cart would be more than in stock.");
             }
 
             cartItem.Product = product;
