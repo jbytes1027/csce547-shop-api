@@ -51,7 +51,8 @@ namespace ShopAPI.Mappers
                 Name = product.Name,
                 Category = product.Category.ToString(),
                 Price = product.Price,
-                Manufacturer = product.Manufacturer
+                Manufacturer = product.Manufacturer,
+                Stock = product.Stock
             };
 
             if (includeDetails)

@@ -8,5 +8,6 @@
         public decimal Price { get; set; }
         public string Manufacturer { get; set; } = string.Empty;
         public Dictionary<string, string> Details { get; set; } = new();
+        public int Stock { get; set; }
     }
 }
