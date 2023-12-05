@@ -1,4 +1,4 @@
-using FU.API.Exceptions;
+﻿using FU.API.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using ShopAPI.Data;
 using ShopAPI.Helpers;
@@ -85,13 +85,8 @@ namespace ShopAPI.Services
         /// <param name="id">The ID of the product to remove.</param>
         public async Task RemoveProductAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-
-            // Check if product exists
-            if (product is null)
-            {
-                throw new NotFoundException();
-            }
+            var product = await _context.Products.FindAsync(id)
+                ?? throw new NotFoundException();
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
@@ -102,31 +97,36 @@ namespace ShopAPI.Services
         /// </summary>
         /// <param name="id">ID of product to update</param>
         /// <param name="price">New price value</param>
-        public async Task UpdatePriceAsync(int id, decimal price)
+        public async Task<Product> UpdateProductPriceAsync(int id, decimal price)
         {
             // Find product
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.FindAsync(id)
+                ?? throw new NotFoundException("Product not found");
+
             product.Price = price;
 
             // Update and save
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
+
+            return product;
         }
 
         /// Updates the stock of a product by its ID.
         /// </summary>
         /// <param name="id">Id of the product.</param>
-        /// <param name="quantity">Quantity to update to.</param>
+        /// <param name="quantity">Quantity to add to stock, positive or negative.</param>
         /// <returns>Nothing.</returns>
-        public async Task UpdateProductStockAsync(int id, int quantity)
+        public async Task<Product> AddProductStockAsync(int id, int quantity)
         {
-            var product = await _context.Products.FindAsync(id) ?? throw new ArgumentException("Invalid product ID");
+            var product = await _context.Products.FindAsync(id)
+                ?? throw new NotFoundException("Product not found");
 
             product.Stock += quantity;
 
             await _context.SaveChangesAsync();
 
-            return;
+            return product;
         }
     }
 }

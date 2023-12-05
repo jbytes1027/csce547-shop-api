@@ -56,6 +56,7 @@ namespace FU.API.Exceptions
         {
             Description = description;
         }
+    }
 
     public class ConflictException : ExceptionWithResponse
     {
