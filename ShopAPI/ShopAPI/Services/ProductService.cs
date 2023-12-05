@@ -120,7 +120,7 @@ namespace ShopAPI.Services
         public async Task<Product> AddProductStockAsync(int id, int quantity)
         {
             var product = await _context.Products.FindAsync(id)
-                ?? throw new ArgumentException("Invalid product ID");
+                ?? throw new NotFoundException("Product not found");
 
             product.Stock += quantity;
 
