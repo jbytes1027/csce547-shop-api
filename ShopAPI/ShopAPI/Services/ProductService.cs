@@ -97,7 +97,7 @@ namespace ShopAPI.Services
         /// </summary>
         /// <param name="id">ID of product to update</param>
         /// <param name="price">New price value</param>
-        public async Task<Product> UpdateProductPrice(int id, decimal price)
+        public async Task<Product> UpdateProductPriceAsync(int id, decimal price)
         {
             // Find product
             var product = await _context.Products.FindAsync(id)
@@ -117,7 +117,7 @@ namespace ShopAPI.Services
         /// <param name="id">Id of the product.</param>
         /// <param name="quantity">Quantity to update to.</param>
         /// <returns>Nothing.</returns>
-        public async Task<Product> AddProductStock(int id, int quantity)
+        public async Task<Product> AddProductStockAsync(int id, int quantity)
         {
             var product = await _context.Products.FindAsync(id)
                 ?? throw new ArgumentException("Invalid product ID");

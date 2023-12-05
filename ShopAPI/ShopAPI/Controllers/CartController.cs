@@ -70,23 +70,13 @@ namespace ShopAPI.Controllers
                 return BadRequest("Expiration date field empty");
             }
 
-            // Make sure we have enough stock
-            foreach (var item in cart)
-            {
-                var product = item.Product;
-                if (product.Stock < item.Quantity)
-                {
-                    return BadRequest("Not enough stock for " + product.Name);
-                }
-            }
+            await _cartService.RemoveCartItemsFromInventoryAsync(dto.CartId);
 
-            await _cartService.UpdateInventoryAfterPurchase(dto.CartId);
-
-            await _cartService.ClearCart(dto.CartId);
+            await _cartService.ClearCartAsync(dto.CartId);
 
             // Get the total with taxes
             decimal grandTotal = Calculate.DefaultBill(cart).GetTotalsDTO().TaxTotal;
-            await _cartService.ClearCart(dto.CartId);
+            await _cartService.ClearCartAsync(dto.CartId);
             return Ok("Payment processed for " + grandTotal);
         }
 
@@ -110,7 +100,7 @@ namespace ShopAPI.Controllers
         [Route("GetCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> GetCart(int cartId)
         {
-            Cart? cart = await _cartService.GetCart(cartId);
+            Cart? cart = await _cartService.GetCartAsync(cartId);
             if (cart is null)
             {
                 return NotFound();
@@ -148,7 +138,7 @@ namespace ShopAPI.Controllers
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
             var bill = Calculate.DefaultBill(items);
-            return Ok(bill.ToJson());
+            return Ok(bill.ToDTO());
         }
 
         [HttpPost]
@@ -175,14 +165,14 @@ namespace ShopAPI.Controllers
         [Route("Cart/ClearCart/{cartId}")]
         public async Task<ActionResult> ClearCart(int cartId)
         {
-            var cart = _cartService.GetCart(cartId).Result;
+            var cart = _cartService.GetCartAsync(cartId).Result;
 
             if (cart is null)
             {
                 return NotFound();
             }
 
-            await _cartService.ClearCart(cartId);
+            await _cartService.ClearCartAsync(cartId);
 
             return NoContent();
         }
@@ -191,16 +181,15 @@ namespace ShopAPI.Controllers
         [Route("Cart/RemoveCart/{cartId}")]
         public async Task<ActionResult<CartDTO>> DeleteCart(int cartId)
         {
-            var cartSearch = await _cartService.GetCart(cartId);
+            var cartSearch = await _cartService.GetCartAsync(cartId);
+
             if (cartSearch == null)
             {
                 return BadRequest("Cart does not exist");
             }
-            else
-            {
-                await _cartService.RemoveCart(cartId);
-                return Ok("Cart removed");
-            }
+
+            await _cartService.RemoveCartAsync(cartId);
+            return NoContent();
         }
     }
 }

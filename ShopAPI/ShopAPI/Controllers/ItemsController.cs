@@ -60,7 +60,7 @@ namespace ShopAPI.Controllers
 
         // POST: api/Item
         [HttpPost]
-        [Route("Item")]
+        [Route("Inventory/AddNewItem")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
             // Try to get category enum from category string
@@ -116,7 +116,7 @@ namespace ShopAPI.Controllers
             }
 
             // Update price and return
-            var product = await _productService.UpdateProductPrice(id, dto.Price);
+            var product = await _productService.UpdateProductPriceAsync(id, dto.Price);
             return Ok(product.ToDTO());
         }
 
@@ -124,7 +124,7 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> AddStock(int id, [FromBody] StockDTO dto)
         {
             // Update stock and return
-            var product = await _productService.AddProductStock(id, dto.Stock);
+            var product = await _productService.AddProductStockAsync(id, dto.Stock);
             return Ok(product.ToDTO());
         }
     }
