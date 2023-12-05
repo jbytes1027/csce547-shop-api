@@ -106,7 +106,7 @@ namespace ShopAPI.Controllers
         }
 
         // PUT: api/Inventory/{id}
-        [HttpPut("Inventory/{id}/ChangePrice")]
+        [HttpPut("Inventory/ChangePrice/{id}")]
         public async Task<IActionResult> UpdatePrice(int id, [FromBody] PriceDTO dto)
         {
             // Error checking
@@ -120,7 +120,7 @@ namespace ShopAPI.Controllers
             return Ok(product.ToDTO());
         }
 
-        [HttpPatch("Inventory/{id}/AddStock")]
+        [HttpPut("Inventory/UpdateStock/{id}")]
         public async Task<IActionResult> AddStock(int id, [FromBody] StockDTO dto)
         {
             // Update stock and return
