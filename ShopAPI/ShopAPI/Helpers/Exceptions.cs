@@ -40,6 +40,23 @@ namespace FU.API.Exceptions
         }
     }
 
+    public class BadRequestException : ExceptionWithResponse
+    {
+        public override string Description { get; } = "Bad Request";
+
+        public override string Title { get; } = "Bad Request";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.BadRequest;
+
+        public BadRequestException()
+        {
+        }
+
+        public BadRequestException(string description)
+        {
+            Description = description;
+        }
+
     public class ConflictException : ExceptionWithResponse
     {
         public override string Description { get; } = "A conflict occured with the requested resource.";

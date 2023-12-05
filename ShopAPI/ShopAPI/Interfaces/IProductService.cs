@@ -1,4 +1,3 @@
-using ShopAPI.DTOs;
 using ShopAPI.Models;
 
 namespace ShopAPI.Interfaces
@@ -9,7 +8,7 @@ namespace ShopAPI.Interfaces
         Task<Product> CreateProductAsync(Product product, Dictionary<string, string> details);
         Task<Product?> GetProductAsync(int id);
         Task RemoveProductAsync(int id);
-        Task UpdatePrice(int id, decimal price);
-        Task UpdateProductStock(int id, int quantity);
+        Task UpdatePriceAsync(int id, decimal price);
+        Task UpdateProductStockAsync(int id, int quantity);
     }
 }

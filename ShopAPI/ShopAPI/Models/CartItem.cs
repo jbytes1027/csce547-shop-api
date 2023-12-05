@@ -2,6 +2,7 @@
 
 namespace ShopAPI.Models
 {
+    // Track a product with an amount
     public class CartItem
     {
         public Product Product { get; set; } = null!;

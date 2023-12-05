@@ -4,6 +4,9 @@ namespace ShopAPI.Helpers
 {
     public static class Calculate
     {
+        /// <summary>
+        /// Calculate a bill based on the given items
+        /// </summary>
         public static Bill DefaultBill(List<CartItem> items)
         {
             Bill bill = new()
@@ -11,7 +14,9 @@ namespace ShopAPI.Helpers
                 Items = items
             };
 
+            // Add 7% sales tax to the bill
             new SalesTaxSurchargeCalculator(0.07).AddCalculatedTo(bill);
+            // Add a 5% bulk discount when ordering more than 10 items
             new BulkDiscountCalculator(quantityThreshold: 10, discountPercent: 0.05).AddCalculatedTo(bill);
 
             return bill;
@@ -19,6 +24,9 @@ namespace ShopAPI.Helpers
 
     }
 
+    /// <summary>
+    /// Stores items, charges, and taxes for a bill
+    /// </summary>
     public class Bill
     {
         public List<CartItem> Items { get; set; }
@@ -35,10 +43,12 @@ namespace ShopAPI.Helpers
         public decimal GetTotalWithoutSurcharges()
         {
             decimal sumTotal = 0;
+            // Add every price*quanity to the total
             foreach (var item in Items)
             {
                 sumTotal += item.Quantity * item.Product.Price;
             }
+            // Ensure 2 decimal places
             return Math.Round(sumTotal, 2);
         }
 
@@ -46,10 +56,12 @@ namespace ShopAPI.Helpers
         {
             decimal sumTotal = 0;
             sumTotal += GetTotalWithoutSurcharges();
+            // Add every surcharge to total
             foreach (var surcharge in BundleSurcharges)
             {
                 sumTotal += surcharge.Cost;
             }
+            // Ensure 2 decimal places
             return Math.Round(sumTotal, 2);
         }
 
@@ -57,18 +69,24 @@ namespace ShopAPI.Helpers
         {
             decimal sumTotal = 0;
             sumTotal += GetTotalWithoutTaxes();
+            // Add every tax to total
             foreach (var surcharge in TaxSurcharges)
             {
                 sumTotal += surcharge.Cost;
             }
+            // Ensure 2 decimal places
             return Math.Round(sumTotal, 2);
         }
     }
 
+    /// <summary>
+    /// Adds a sales tax surcharge to the bill
+    /// </summary>
     public class SalesTaxSurchargeCalculator : ISurchargeCalculator
     {
         public double TaxRate;
 
+        /// <param name="taxRate">The percent of sales tax to add</param>
         public SalesTaxSurchargeCalculator(double taxRate)
         {
             TaxRate = taxRate;
@@ -76,10 +94,12 @@ namespace ShopAPI.Helpers
 
         public void AddCalculatedTo(Bill bill)
         {
-            decimal taxCharge = bill.GetTotalWithTaxes() * (decimal)TaxRate;
-            Surcharge taxSurcharge = new() { Cost = taxCharge, Description = "Sales Tax" };
+            // new tax charge = tax total before charge * tax rate
+            decimal salesTaxChargeAmount = bill.GetTotalWithTaxes() * (decimal)TaxRate;
+            // Create a new surcharge from the calculated tax charge
+            Surcharge salesTaxSurcharge = new() { Cost = salesTaxChargeAmount, Description = "Sales Tax" };
 
-            bill.TaxSurcharges.Add(taxSurcharge);
+            bill.TaxSurcharges.Add(salesTaxSurcharge);
         }
     }
 
@@ -96,10 +116,12 @@ namespace ShopAPI.Helpers
 
         public void AddCalculatedTo(Bill bill)
         {
+            // For every item bought x or more times, add a discount for that item to the bill
             foreach (var item in bill.Items)
             {
                 if (item.Quantity >= QuantityThreshold)
                 {
+                    // discount deduction = cost of x items bought * percent off
                     decimal discount = -1 * item.Quantity * item.Product.Price * (decimal)DiscountPercent;
 
                     bill.BundleSurcharges.Add(

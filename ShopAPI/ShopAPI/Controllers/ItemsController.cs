@@ -121,7 +121,7 @@ namespace ShopAPI.Controllers
             }
 
             // Update price and return
-            await _productService.UpdatePrice(id, dto.Price);
+            await _productService.UpdatePriceAsync(id, dto.Price);
             product = await _productService.GetProductAsync(id);
             return Ok(product.ToDTO());
         }
@@ -137,7 +137,7 @@ namespace ShopAPI.Controllers
             }
 
             // Update stock and return
-            await _productService.UpdateProductStock(id, dto.Stock);
+            await _productService.UpdateProductStockAsync(id, dto.Stock);
             product = await _productService.GetProductAsync(id);
             return Ok(product.ToDTO());
         }
