@@ -74,6 +74,11 @@ namespace ShopAPI.Services
                 _context.CartItems.Add(cartItem);
             }
 
+            if (product.Stock < cartItem.Quantity)
+            {
+                throw new ConflictException("Quantity in cart would be more than in stock.");
+            }
+
             cartItem.Product = product;
 
             await _context.SaveChangesAsync();
@@ -157,7 +162,7 @@ namespace ShopAPI.Services
         {
             if (_context.Carts.Find(cartId) is null)
             {
-                throw new NotFoundException();
+                throw new NotFoundException("Cart not found");
             }
         }
 
