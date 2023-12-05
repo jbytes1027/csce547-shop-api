@@ -24,7 +24,7 @@ namespace FU.API.Exceptions
 
     public class NotFoundException : ExceptionWithResponse
     {
-        public override string Description { get; } = "The requested resourse was not found";
+        public override string Description { get; } = "The requested resource was not found.";
 
         public override string Title { get; } = "Not found";
 
@@ -53,6 +53,23 @@ namespace FU.API.Exceptions
         }
 
         public BadRequestException(string description)
+        {
+            Description = description;
+        }
+
+    public class ConflictException : ExceptionWithResponse
+    {
+        public override string Description { get; } = "A conflict occured with the requested resource.";
+
+        public override string Title { get; } = "Conflict";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.Conflict;
+
+        public ConflictException()
+        {
+        }
+
+        public ConflictException(string description)
         {
             Description = description;
         }

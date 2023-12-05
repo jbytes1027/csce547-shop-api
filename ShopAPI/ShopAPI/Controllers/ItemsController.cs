@@ -60,7 +60,7 @@ namespace ShopAPI.Controllers
 
         // POST: api/Item
         [HttpPost]
-        [Route("Item")]
+        [Route("Inventory/AddNewItem")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
         {
             // Try to get category enum from category string

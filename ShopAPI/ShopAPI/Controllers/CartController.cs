@@ -138,7 +138,7 @@ namespace ShopAPI.Controllers
             List<CartItem> items = await _cartService.GetCartItemsAsync(cartId);
 
             var bill = Calculate.DefaultBill(items);
-            return Ok(bill.ToJson());
+            return Ok(bill.ToDTO());
         }
 
         [HttpPost]
