@@ -115,7 +115,7 @@ namespace ShopAPI.Services
         /// Updates the stock of a product by its ID.
         /// </summary>
         /// <param name="id">Id of the product.</param>
-        /// <param name="quantity">Quantity to update to.</param>
+        /// <param name="quantity">Quantity to add to stock, positive or negative.</param>
         /// <returns>Nothing.</returns>
         public async Task<Product> AddProductStockAsync(int id, int quantity)
         {
