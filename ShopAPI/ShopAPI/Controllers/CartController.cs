@@ -31,43 +31,43 @@ namespace ShopAPI.Controllers
             // Cart is empty, nothing to process
             if (!cart.Any())
             {
-                return BadRequest("Cart is empty");
+                return Conflict("Cart is empty");
             }
 
             // Field checking
             if (dto.CardNumber.ToString().Length != 16)
             {
-                return BadRequest("Card length incorrect");
+                return UnprocessableEntity("Card length incorrect");
             }
 
             if (dto.Cvv.ToString().Length != 3)
             {
-                return BadRequest("CVV length incorrect");
+                return UnprocessableEntity("CVV length incorrect");
             }
 
             if (string.IsNullOrEmpty(dto.Cvv.ToString()))
             {
-                return BadRequest("CVV field empty");
+                return UnprocessableEntity("CVV field empty");
             }
 
             if (string.IsNullOrEmpty(dto.CardHolderName))
             {
-                return BadRequest("Holder name field empty");
+                return UnprocessableEntity("Holder name field empty");
             }
 
             if (string.IsNullOrEmpty(dto.CartId.ToString()))
             {
-                return BadRequest("Card ID field empty");
+                return UnprocessableEntity("Card ID field empty");
             }
 
             if (string.IsNullOrEmpty(dto.CardNumber.ToString()))
             {
-                return BadRequest("Card Number field empty");
+                return UnprocessableEntity("Card Number field empty");
             }
 
             if (string.IsNullOrEmpty(dto.Exp))
             {
-                return BadRequest("Expiration date field empty");
+                return UnprocessableEntity("Expiration date field empty");
             }
 
             await _cartService.RemoveCartItemsFromInventoryAsync(dto.CartId);
@@ -87,7 +87,7 @@ namespace ShopAPI.Controllers
         {
             if (item.Quantity < 0)
             {
-                return BadRequest("Quantity must be positive");
+                return UnprocessableEntity("Quantity must be positive");
             }
 
             var cartItem = await _cartService.AddItemAsync(cartId, item.Id, item.Quantity);
@@ -103,7 +103,7 @@ namespace ShopAPI.Controllers
             Cart? cart = await _cartService.GetCartAsync(cartId);
             if (cart is null)
             {
-                return NotFound();
+                return NotFound("Cart not found");
             }
 
             var bill = Calculate.DefaultBill(cart.Items);
@@ -169,7 +169,7 @@ namespace ShopAPI.Controllers
 
             if (cart is null)
             {
-                return NotFound();
+                return NotFound("Cart not found");
             }
 
             await _cartService.ClearCartAsync(cartId);
@@ -185,7 +185,7 @@ namespace ShopAPI.Controllers
 
             if (cartSearch == null)
             {
-                return BadRequest("Cart does not exist");
+                return NotFound("Cart not found");
             }
 
             await _cartService.RemoveCartAsync(cartId);

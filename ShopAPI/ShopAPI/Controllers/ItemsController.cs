@@ -52,7 +52,7 @@ namespace ShopAPI.Controllers
 
             if (product == null)
             {
-                return NotFound();
+                return NotFound("Product not found");
             }
 
             return Ok(product.ToDTO());
@@ -68,7 +68,7 @@ namespace ShopAPI.Controllers
 
             if (!parseSuccess)
             {
-                return BadRequest("Invalid category");
+                return UnprocessableEntity("Invalid category");
             }
 
             // Create a new base product entity
@@ -77,10 +77,10 @@ namespace ShopAPI.Controllers
             // Make sure the product details are valid
             var validationError = ProductHelper.ValidateProductDetails(productCategory, dto.Details);
 
-            // If the product details are invalid, return a bad request
+            // If the product details are invalid, return an error
             if (validationError != null)
             {
-                return BadRequest(validationError);
+                return UnprocessableEntity(validationError);
             }
 
             // Add the product to the database
@@ -97,7 +97,7 @@ namespace ShopAPI.Controllers
             var product = await _productService.GetProductAsync(id);
             if (product == null)
             {
-                return NotFound();
+                return NotFound("Product not found");
             }
 
             await _productService.RemoveProductAsync(id);
@@ -112,7 +112,7 @@ namespace ShopAPI.Controllers
             // Error checking
             if (dto.Price < 0)
             {
-                return BadRequest("Price must be 0 or greater");
+                return UnprocessableEntity("Price must be 0 or greater");
             }
 
             // Update price and return
