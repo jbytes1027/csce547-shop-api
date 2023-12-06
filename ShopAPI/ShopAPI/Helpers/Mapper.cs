@@ -1,4 +1,4 @@
-﻿using ShopAPI.DTOs;
+using ShopAPI.DTOs;
 using ShopAPI.Helpers;
 using ShopAPI.Models;
 
@@ -132,19 +132,40 @@ namespace ShopAPI.Mappers
         /// Ensures bill has 2 digit rounding
         /// </summary>
         /// <returns>Returns a bill with charges rounded to 2 decimal places</returns>
-        public static Bill ToDTO(this Bill bill)
+        public static BillDTO ToDTO(this Bill bill)
         {
-            foreach (var surcharge in bill.TaxSurcharges)
+            BillDTO billDTO = new()
+            {
+                BaseCharges = new(),
+                BundleSurcharges = bill.BundleSurcharges,
+                TaxSurcharges = bill.TaxSurcharges,
+            };
+
+            // Round tax surcharges to 2 decimal places
+            foreach (var surcharge in billDTO.TaxSurcharges)
             {
                 surcharge.Cost = Math.Round(surcharge.Cost, 2);
             }
 
-            foreach (var surcharge in bill.BundleSurcharges)
+            // Round bundle surcharges to 2 decimal places
+            foreach (var surcharge in billDTO.BundleSurcharges)
             {
                 surcharge.Cost = Math.Round(surcharge.Cost, 2);
             }
 
-            return bill;
+            // Add each item to the DTO as a surcharge
+            foreach (var item in bill.Items)
+            {
+                billDTO.BaseCharges.Add(new Surcharge()
+                {
+                    // Round cost to 2 decimal places
+                    Cost = Math.Round(item.Product.Price, 2),
+                    // Ex 5X AMD Ryzen...
+                    Description = item.Quantity + "X " + item.Product.Name,
+                });
+            }
+
+            return billDTO;
         }
     }
 }
