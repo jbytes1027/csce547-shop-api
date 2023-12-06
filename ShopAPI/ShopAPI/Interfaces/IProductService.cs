@@ -9,6 +9,6 @@ namespace ShopAPI.Interfaces
         Task<Product?> GetProductAsync(int id);
         Task RemoveProductAsync(int id);
         Task<Product> UpdateProductPriceAsync(int id, decimal price);
-        Task<Product> AddProductStockAsync(int id, int quantity);
+        Task<Product> UpdateProductStockAsync(int id, int quantity);
     }
 }

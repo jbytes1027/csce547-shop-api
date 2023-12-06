@@ -33,6 +33,7 @@ namespace ShopAPI.Mappers
             product.Price = dto.Price;
             product.Manufacturer = dto.Manufacturer;
             product.NormalizedName = dto.Name.ToLower();
+            product.Stock = dto.Stock;
 
             return product;
         }
@@ -112,6 +113,19 @@ namespace ShopAPI.Mappers
         public static CartItemDTO ToDTO(this CartItem cartItem)
         {
             return new CartItemDTO(cartItem.Product.ToDTO(), cartItem.Quantity);
+        }
+
+        public static CartDTO ToDTO(this Cart cart)
+        {
+            CartDTO dto = new CartDTO
+            {
+                Id = cart.Id,
+                Name = cart.Name,
+                Items = cart.Items.ToDTO(),
+                Totals = Calculate.DefaultBill(cart.Items).GetTotalsDTO()
+            };
+
+            return dto;
         }
 
         /// <summary>

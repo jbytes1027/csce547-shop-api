@@ -117,13 +117,17 @@ namespace ShopAPI.Services
         /// <param name="id">Id of the product.</param>
         /// <param name="quantity">Quantity to add to stock, positive or negative.</param>
         /// <returns>Nothing.</returns>
-        public async Task<Product> AddProductStockAsync(int id, int quantity)
+        public async Task<Product> UpdateProductStockAsync(int id, int quantity)
         {
+            if (quantity < 0)
+            {
+                throw new UnprocessableContentException("Quantity must be greater than or equal to 0");
+            }
+
             var product = await _context.Products.FindAsync(id)
                 ?? throw new NotFoundException("Product not found");
 
-            product.Stock += quantity;
-
+            product.Stock = quantity;
             await _context.SaveChangesAsync();
 
             return product;
