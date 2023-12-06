@@ -125,7 +125,7 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> UpdateStock(int id, [FromBody] StockDTO dto)
         {
             // Update stock and return
-            var product = await _productService.AddProductStockAsync(id, dto.Stock);
+            var product = await _productService.UpdateProductStockAsync(id, dto.Stock);
             return Ok(product.ToDTO());
         }
     }
