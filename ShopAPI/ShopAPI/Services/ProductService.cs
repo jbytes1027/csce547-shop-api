@@ -86,7 +86,7 @@ namespace ShopAPI.Services
         public async Task RemoveProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id)
-                ?? throw new NotFoundException();
+                ?? throw new NotFoundException("Product not found");
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();

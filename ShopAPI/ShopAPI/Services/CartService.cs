@@ -16,7 +16,7 @@ namespace ShopAPI.Services
         }
 
         /// <exception cref="NotFoundException">Thrown when an product in the cart doesn't exist</exception>
-        /// <exception cref="BadRequestException">Thrown when there isn't enough stock in the inventory to remove</exception>
+        /// <exception cref="ConflictException">Thrown when there isn't enough stock in the inventory to remove</exception>
         public async Task RemoveCartItemsFromInventoryAsync(int cartId)
         {
             AssertCartExists(cartId);
@@ -31,7 +31,7 @@ namespace ShopAPI.Services
                 // Make there is enough in stock
                 if (product.Stock < cartItem.Quantity)
                 {
-                    throw new BadRequestException("Not enough stock for " + cartItem.Product.Name);
+                    throw new ConflictException("Not enough stock for " + cartItem.Product.Name);
                 }
 
                 product.Stock -= cartItem.Quantity;
@@ -116,7 +116,7 @@ namespace ShopAPI.Services
             }
 
             CartItem? cartItem = _context.CartItems.Find(cartId, productId)
-                ?? throw new NotFoundException();
+                ?? throw new NotFoundException("Item not found in cart");
 
             if (quantity >= cartItem.Quantity)
             {
