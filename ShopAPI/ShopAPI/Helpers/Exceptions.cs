@@ -40,6 +40,24 @@ namespace FU.API.Exceptions
         }
     }
 
+    public class UnprocessableContentException : ExceptionWithResponse
+    {
+        public override string Description { get; } = "Content unprocessable";
+
+        public override string Title { get; } = "Content unprocessable";
+
+        public override HttpStatusCode StatusCode { get; } = HttpStatusCode.UnprocessableEntity;
+
+        public UnprocessableContentException()
+        {
+        }
+
+        public UnprocessableContentException(string description)
+        {
+            Description = description;
+        }
+    }
+
     public class ConflictException : ExceptionWithResponse
     {
         public override string Description { get; } = "A conflict occured with the requested resource.";

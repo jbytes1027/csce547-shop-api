@@ -120,11 +120,12 @@ namespace ShopAPI.Controllers
             return Ok(product.ToDTO());
         }
 
+        // PUT: api/Inventory/{id}
         [HttpPut("Inventory/UpdateStock/{id}")]
-        public async Task<IActionResult> AddStock(int id, [FromBody] StockDTO dto)
+        public async Task<IActionResult> UpdateStock(int id, [FromBody] StockDTO dto)
         {
             // Update stock and return
-            var product = await _productService.AddProductStockAsync(id, dto.Stock);
+            var product = await _productService.UpdateProductStockAsync(id, dto.Stock);
             return Ok(product.ToDTO());
         }
     }
