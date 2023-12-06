@@ -114,6 +114,19 @@ namespace ShopAPI.Mappers
             return new CartItemDTO(cartItem.Product.ToDTO(), cartItem.Quantity);
         }
 
+        public static CartDTO ToDTO(this Cart cart)
+        {
+            CartDTO dto = new CartDTO
+            {
+                Id = cart.Id,
+                Name = cart.Name,
+                Items = cart.Items.ToDTO(),
+                Totals = Calculate.DefaultBill(cart.Items).GetTotalsDTO()
+            };
+
+            return dto;
+        }
+
         /// <summary>
         /// Ensures bill has 2 digit rounding
         /// </summary>

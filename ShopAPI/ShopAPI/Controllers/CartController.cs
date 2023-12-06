@@ -106,17 +106,7 @@ namespace ShopAPI.Controllers
                 return NotFound();
             }
 
-            var bill = Calculate.DefaultBill(cart.Items);
-
-            CartDTO cartDTO = new()
-            {
-                Id = cartId,
-                Name = cart.Name,
-                Items = cart.Items.ToDTO(),
-                Totals = bill.GetTotalsDTO(),
-            };
-
-            return Ok(cartDTO);
+            return Ok(cart.ToDTO());
         }
 
         // GET: api/GetTotals/{cartId}
@@ -146,7 +136,8 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> CreateNewCart(Cart cart)
         {
             var newCart = await _cartService.CreateCartAsync(cart.Name);
-            return Ok(newCart);
+
+            return Ok(newCart.ToDTO());
         }
 
         [HttpDelete]
