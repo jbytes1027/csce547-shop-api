@@ -1,6 +1,7 @@
-namespace ShopAPI.DTOs;
-
-public class StockDTO
+namespace ShopAPI.DTOs
 {
-    public int Stock { get; set; }
+    public class StockDTO
+    {
+        public int Stock { get; set; }
+    }
 }
