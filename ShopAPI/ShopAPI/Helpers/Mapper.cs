@@ -33,7 +33,6 @@ namespace ShopAPI.Mappers
             product.Price = dto.Price;
             product.Manufacturer = dto.Manufacturer;
             product.NormalizedName = dto.Name.ToLower();
-            product.Stock = dto.Stock;
 
             return product;
         }
