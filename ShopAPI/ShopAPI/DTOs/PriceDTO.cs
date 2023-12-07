@@ -1,6 +1,7 @@
-namespace ShopAPI.DTOs;
-
-public class PriceDTO
+namespace ShopAPI.DTOs
 {
-    public decimal Price { get; set; }
+    public class PriceDTO
+    {
+        public decimal Price { get; set; }
+    }
 }
