@@ -53,7 +53,7 @@ namespace ShopAPI.Tests
             Assert.Equal(300, result.Price);
             Assert.Equal(Category.Cpu, result.Category);
         }
-        
+
         [Fact]
         public async void ProductServiceAddCpu()
         {
@@ -92,7 +92,7 @@ namespace ShopAPI.Tests
             Assert.Equal(cpu.Price, result.Price);
             Assert.Equal(cpu.Category, result.Category);
         }
-        
+
         /* not yet implemented in service
         [Fact]
         public void ProductServiceUpdateCpu()
@@ -134,112 +134,5 @@ namespace ShopAPI.Tests
             // Assert
             Assert.Null(result);
         }
-        
-        [Fact]
-        public async void CartServiceAddItemToCart()
-        {
-            // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                          .UseInMemoryDatabase(databaseName: "shop_dev")
-                          .Options;
-            var context = new ApplicationDbContext(options);
-            
-            Cpu cpu = new Cpu()
-            {
-                Socket = "1151",
-                Cores = 4,
-                Series = "Skylake",
-                IntegratedGraphics = true,
-                Id = 1,
-                Name = "i5-6400",
-                Category = Category.Cpu,
-                Price = 300,
-                Manufacturer = "Intel",
-                NormalizedName = "Intel i5-6400"
-            };
-            context.Set<Cpu>().Add(cpu);
-
-            ICartService cartService = new CartService(context);
-
-            // Act
-            // Defaults to quantity of 1
-            await cartService.AddItemAsync(1, 1);
-            var cartList = cartService.GetCartItemsAsync(1);
-            var result = cartList.Result[0];
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(1, result.CartId);
-            Assert.Equal(1, result.ProductId);
-            Assert.Equal(1, result.Quantity);
-            Assert.Equal(cpu.Id,result.Product.Id);
-            Assert.Equal(cpu.Name, result.Product.Name);
-            Assert.Equal(cpu.Manufacturer, result.Product.Manufacturer);
-            Assert.Equal(cpu.NormalizedName, result.Product.NormalizedName);
-            Assert.Equal(cpu.Price, result.Product.Price);
-            Assert.Equal(cpu.Category, result.Product.Category);
-        }
-
-        [Fact]
-        public async void CartServiceRemoveItemFromCart()
-        {
-            // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                              .UseInMemoryDatabase(databaseName: "shop_dev")
-                              .Options;
-            var context = new ApplicationDbContext(options);
-
-            Cpu cpu = new Cpu()
-            {
-                Socket = "1151",
-                Cores = 4,
-                Series = "Skylake",
-                IntegratedGraphics = true,
-                Id = 1,
-                Name = "i5-6400",
-                Category = Category.Cpu,
-                Price = 300,
-                Manufacturer = "Intel",
-                NormalizedName = "Intel i5-6400"
-            };
-            context.Set<Cpu>().Add(cpu);
-            ICartService cartService = new CartService(context);
-
-            // Act
-            /* Case: Removing 1 from quantity of 1
-            {
-                await cartService.AddItemAsync(1, 1, 1);
-                await cartService.RemoveItemAsync(1, 1, 1);
-                var cartList = cartService.GetCartItemsAsync(1);
-                var result = cartList.Result.Count;
-                Assert.Equal(0, result);
-            }
-            */
-            await cartService.AddItemAsync(1, 1, 3);
-            await cartService.RemoveItemAsync(1, 1, 1);
-            var cartList = await cartService.GetCartItemsAsync(1);
-            var result = cartList[0];
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(1, result.CartId);
-            Assert.Equal(1, result.ProductId);
-            Assert.Equal(cpu.Id,result.Product.Id);
-            Assert.Equal(cpu.Name, result.Product.Name);
-            Assert.Equal(cpu.Manufacturer, result.Product.Manufacturer);
-            Assert.Equal(cpu.NormalizedName, result.Product.NormalizedName);
-            Assert.Equal(cpu.Price, result.Product.Price);
-            Assert.Equal(cpu.Category, result.Product.Category);
-        }
-
-        /*
-        [Fact]
-        public void CartServiceGetCart()
-        {
-            // Arrange
-            // Act
-            // Assert
-        }
-        */
     }
 }

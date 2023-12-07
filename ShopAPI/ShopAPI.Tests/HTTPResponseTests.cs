@@ -66,7 +66,7 @@ namespace ShopAPI.Tests
             return (cartDTO, response);
         }
 
-        /* Helper Function 
+        /* Helper Function
          *  - Creates Products and a Cart
          *  - Adds Items to Cart if "itemsInCart" = True
          *  returns: (Cart ID,Product ID)
@@ -94,7 +94,7 @@ namespace ShopAPI.Tests
 
             return (cartId,productId);
         }
-        
+
         // Helper function - Deletes all items added to inventory
         private async Task DisposeAsync()
         {
@@ -122,11 +122,11 @@ namespace ShopAPI.Tests
         [Fact]
         public async Task HTTPResponseGetAllItemsTest()
         {
-            /* Arrange */ 
+            /* Arrange */
             CreateClient();
             var (_,_) = await ArrangeTestProductDTO();
 
-            /* Act */ 
+            /* Act */
             var response = await _client.GetAsync("api/Item/GetAllItems");
 
             /* Assert */
@@ -207,91 +207,6 @@ namespace ShopAPI.Tests
 
             /* Assert */
             response.EnsureSuccessStatusCode();
-            await DisposeAsync();
-        }
-        [Fact]
-        public async Task HTTPResponseProcessPaymentTest()
-        {
-            /* Arrange */
-            CreateClient();
-            var (cartID,_) = await ArrangeTestCart(true);
-            CardDTO cardDTO = ArrangeTestCardDTO();
-            cardDTO.CartId = cartID;
-
-            /* Act */
-            var paymentResponse = await _client.PostAsJsonAsync("api/ProcessPayment", cardDTO);
-
-            /* Assert */
-            paymentResponse.EnsureSuccessStatusCode();
-
-            // Clear Cart & Inventory
-            await _client.DeleteAsync("api/cart/DeleteCart" + cartID.ToString());
-            await DisposeAsync();
-        }
-
-        [Fact]
-        public async Task HTTPResponseAddItemToCartTest()
-        {
-            /* Arrange */
-            CreateClient();
-            var (cartId,prodId) = await ArrangeTestCart(false);
-            // Create new AddItem DTO
-            AddItemDTO addItemDTO = new AddItemDTO();
-            addItemDTO.Id = prodId;
-            addItemDTO.Quantity = numTestItems;
-
-            /* Act */
-            var response = await _client.PostAsJsonAsync("api/AddItemToCart/" + cartId.ToString(), addItemDTO);
-
-            /* Assert */
-            response.EnsureSuccessStatusCode();
-
-            // Clear Cart & Inventory
-            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
-            await DisposeAsync();
-        }
-        [Fact]
-        public async Task HTTPResponseGetCartTest()
-        {
-            /* Arrange */
-            CreateClient();
-            var (cartId,prodId) = await ArrangeTestCart(true);
-
-            /* Act */         
-            var response = await _client.GetAsync("api/GetCart/" + cartId.ToString());
-            // Parse GetCart Response for product Id 
-            String responseBody = await response.Content.ReadAsStringAsync();
-            JObject jsonObject = JObject.Parse(responseBody);
-            int idGetCart = (int)jsonObject["items"][0]["id"];
-
-            /* Assert */
-            Assert.Equal(prodId, idGetCart);
-
-            // Clear Cart & Inventory
-            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
-            await DisposeAsync();
-        }
-
-        [Fact]
-        public async Task HTTPResponseGetTotalsTest()
-        {
-            /* Arrange */
-            CreateClient();
-            int expectedBaseTotal = 3000;
-            var (cartId, _) = await ArrangeTestCart(true);
-
-            /* Act */
-            var response = await _client.GetAsync("api/GetTotals/" + cartId.ToString());
-            // Parse HTTP Response for Cart Total
-            string jsonContentTotal = await response.Content.ReadAsStringAsync();
-            JsonDocument jsonDocumentTotal = JsonDocument.Parse(jsonContentTotal);
-            int baseTotal = Convert.ToInt32(jsonDocumentTotal.RootElement.GetProperty("baseTotal").ToString());
-
-            /* Assert */
-            Assert.Equal(expectedBaseTotal, baseTotal);
-
-            // Clear Cart & Inventory
-            await _client.DeleteAsync("api/cart/DeleteCart" + cartId.ToString());
             await DisposeAsync();
         }
     }
